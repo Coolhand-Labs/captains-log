@@ -42,6 +42,15 @@ type CaptureHandler = (captured: CapturedFeedback) => void;
 let handler: CaptureHandler | null = null;
 let nextId = 1;
 let installed = false;
+let passthroughFetch: typeof window.fetch = (...args) => window.fetch(...args);
+
+/**
+ * The un-wrapped fetch. feedback-encoder.ts submits REAL feedback to the same
+ * Coolhand URL the widgets target — it must bypass this interception layer.
+ */
+export function realFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  return passthroughFetch(input, init);
+}
 
 /** The session store registers here; unhandled captures are dropped (safe in demo). */
 export function setFeedbackCaptureHandler(h: CaptureHandler | null): void {
@@ -65,6 +74,7 @@ export function installFeedbackTransport(): void {
   installed = true;
 
   const originalFetch = window.fetch.bind(window);
+  passthroughFetch = originalFetch;
 
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url =

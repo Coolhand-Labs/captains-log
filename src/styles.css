@@ -297,6 +297,222 @@ select {
   font-weight: 600;
 }
 
+/* ---- Review game ---- */
+
+.cl-session-header {
+  border-bottom: 1px solid var(--cl-border);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cl-session-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cl-workload-label {
+  font-weight: 700;
+  color: var(--cl-secondary);
+}
+
+.cl-created-at {
+  color: var(--cl-text-faint);
+  font-size: 0.85rem;
+}
+
+.cl-session-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.cl-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--cl-bg-inset);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.cl-progress-fill {
+  height: 100%;
+  background: var(--cl-accent);
+  transition: width 200ms ease;
+}
+
+.cl-clock {
+  font-family: var(--cl-font-mono);
+}
+
+.cl-clock-over {
+  color: var(--cl-danger);
+  font-weight: 700;
+}
+
+.cl-time-up-banner {
+  margin: 0.5rem 0 0;
+  color: var(--cl-danger);
+  font-weight: 600;
+}
+
+.cl-pause-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.85);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+}
+
+.cl-paused-content {
+  filter: blur(2px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.cl-output-panel {
+  margin-bottom: 1rem;
+}
+
+.cl-output-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cl-mode-toggle {
+  display: inline-flex;
+  border: 1px solid var(--cl-border-strong);
+  border-radius: var(--cl-radius-sm);
+  overflow: hidden;
+}
+
+.cl-mode-toggle button {
+  border: none;
+  border-radius: 0;
+  padding: 0.35rem 0.9rem;
+  background: transparent;
+}
+
+.cl-mode-toggle .cl-mode-active {
+  background: var(--cl-accent);
+  color: var(--cl-accent-contrast);
+  font-weight: 600;
+}
+
+/* AI text visually delineated from UI chrome (PRD §7.3). */
+.cl-output-body,
+.cl-output-editor {
+  background: var(--cl-output-bg);
+  border: 1px solid var(--cl-output-border);
+  border-radius: var(--cl-radius);
+  padding: 1rem 1.25rem;
+  width: 100%;
+}
+
+.cl-output-editor {
+  font-family: var(--cl-font-mono);
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.cl-markdown h1 {
+  font-size: 1.4rem;
+}
+
+.cl-markdown h2 {
+  font-size: 1.15rem;
+}
+
+.cl-markdown :first-child {
+  margin-top: 0;
+}
+
+.cl-markdown :last-child {
+  margin-bottom: 0;
+}
+
+.cl-reference {
+  margin: 0.75rem 0;
+}
+
+.cl-collapsible-toggle {
+  border: none;
+  padding: 0.3rem 0;
+  color: var(--cl-secondary);
+}
+
+.cl-collapsible-body {
+  background: var(--cl-bg-inset);
+  border: 1px solid var(--cl-border);
+  border-radius: var(--cl-radius-sm);
+  padding: 0.75rem 1rem;
+  font-family: var(--cl-font-mono);
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.cl-feedback-controls {
+  margin: 1rem 0;
+}
+
+.cl-sentiment-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cl-sentiment-btn {
+  padding: 0.5rem 1.1rem;
+}
+
+.cl-sentiment-active {
+  background: var(--cl-accent);
+  border-color: var(--cl-accent);
+  color: var(--cl-accent-contrast);
+  font-weight: 600;
+}
+
+.cl-explanation-label {
+  display: block;
+  color: var(--cl-text-dim);
+}
+
+.cl-explanation-label textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.cl-warning-banner {
+  border-left: 3px solid var(--cl-accent);
+  background: var(--cl-bg-raised);
+  color: var(--cl-text-dim);
+  font-size: 0.85rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0 var(--cl-radius-sm) var(--cl-radius-sm) 0;
+}
+
+.cl-review-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
 .cl-toasts {
   position: fixed;
   bottom: 1.25rem;

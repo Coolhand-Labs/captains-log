@@ -10,7 +10,8 @@ import {
 import { createDemoProvider } from '../services/demo/demo-provider';
 import { mulberry32, samplePlan } from '../services/sampling';
 import { runtimeConfig } from '../config/runtime-config';
-import { startTimer } from './timer';
+import { submitDraft } from '../services/api-client';
+import { startTimer, stopTimer, timeUp } from './timer';
 
 /** Active backend seam — demo provider or HTTP client, chosen at auth time. */
 export const provider = signal<ReviewQueueProvider | null>(null);
@@ -114,6 +115,53 @@ export function resetSession(): void {
   skips.value = [];
   partialRoutes.clear();
   mainRoutes.clear();
+}
+
+export type AdvanceResult = 'advanced' | 'session-complete';
+
+/**
+ * The time box is soft (PRD §7.5): time-up never interrupts mid-item, it ends
+ * the session at the next submit/skip boundary. Queue exhaustion ends immediately.
+ */
+function advance(): AdvanceResult {
+  if (timeUp.value || currentIndex.value + 1 >= queue.value.length) {
+    stopTimer();
+    return 'session-complete';
+  }
+  currentIndex.value += 1;
+  return 'advanced';
+}
+
+/**
+ * Submit & Next: POSTs the full package (edits, partials, sentiment,
+ * explanation). Throws on submission failure so the screen shows inline
+ * error + retry and never advances past an unsaved item (PRD §7.3).
+ */
+export async function submitCurrentItem(): Promise<AdvanceResult> {
+  const item = currentItem.value;
+  if (!item) return 'session-complete';
+  const draft = draftFor(item.id);
+  await submitDraft(item, draft);
+  submissions.value = [
+    ...submissions.value,
+    {
+      itemId: item.id,
+      workloadId: item.workload_id,
+      submittedAt: new Date().toISOString(),
+      draft,
+      arm: arms.value.get(item.id),
+    },
+  ];
+  return advance();
+}
+
+/** Skip: logged, nothing submitted, item not marked reviewed (PRD §7.3). */
+export function skipCurrentItem(): AdvanceResult {
+  const item = currentItem.value;
+  if (!item) return 'session-complete';
+  skips.value = [...skips.value, { itemId: item.id, skippedAt: new Date().toISOString() }];
+  discardDraft(item.id);
+  return advance();
 }
 
 /* ------------------------------------------------------------------------ *

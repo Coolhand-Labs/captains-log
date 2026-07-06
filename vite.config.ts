@@ -20,6 +20,13 @@ export default defineConfig({
     // without this Vite treats it as source and skips CJS interop.
     include: ['coolhand'],
   },
+  build: {
+    commonjsOptions: {
+      // The symlinked coolhand dep resolves OUTSIDE node_modules, so the
+      // default include pattern would skip its UMD→ESM interop.
+      include: [/node_modules/, /coolhand-js/],
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.ts'],
