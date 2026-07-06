@@ -175,8 +175,10 @@ export async function checkFreshItems(): Promise<ReviewItem[]> {
   const fresh: ReviewItem[] = [];
   let offset: number | undefined = 0;
   do {
+    // Only items that ARRIVED after the session's window closed count as fresh —
+    // items that were in the window but deliberately not sampled do not.
     const page = await p.fetchQueue({
-      time_window_start: config.windowStart,
+      time_window_start: config.windowEnd,
       time_window_end: new Date().toISOString(),
       creator_unique_id: creatorUniqueId(),
       exclude_reviewed_by_creator: true,

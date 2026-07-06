@@ -68,7 +68,9 @@ export function createDemoProvider(): ReviewQueueProvider & {
         .map((item) => ({
           ...item,
           id: `fresh-${++freshCounter}-${item.id}`,
-          created_at: new Date(now - 60_000).toISOString(),
+          // Stamped "now" so they land after the session window closed —
+          // they must register as fresh arrivals, not window backlog.
+          created_at: new Date(now).toISOString(),
           already_reviewed_by_creator: false,
         }));
       items = [...items, ...fresh];
