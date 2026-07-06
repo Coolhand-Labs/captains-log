@@ -1,0 +1,10 @@
+{
+  "_comment": "Copy to config.json next to index.html to configure a deployment. Omit the file entirely for demo mode. See CONFIGURATION.md.",
+  "mode": "coolhand",
+  "reviewQueueUrl": "https://coolhandlabs.com/captain/review-queue",
+  "feedbackUrl": "https://your-backend.example.com/captain/review-queue",
+  "coolhandOauthClientId": "your-oauth-client-id",
+  "coolhandApiKey": "",
+  "creatorId": "",
+  "demo": false
+}

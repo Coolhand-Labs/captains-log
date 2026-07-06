@@ -1,0 +1,47 @@
+{
+  "name": "captainslog",
+  "version": "0.1.0",
+  "description": "Control plane for AI process review — time-boxed, gamified review of AI outputs with rich feedback capture",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Coolhand-Labs/captainslog.git"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:a11y": "vitest run --dir src --testNamePattern a11y",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@preact/signals": "^2.0.0",
+    "coolhand": "file:/Users/woodchip/coolhand-packages/sdks/coolhand-js",
+    "dompurify": "^3.2.0",
+    "marked": "^15.0.0",
+    "preact": "^10.26.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@preact/preset-vite": "^2.10.0",
+    "@testing-library/preact": "^3.2.4",
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^26.1.0",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.0",
+    "jsdom": "^26.0.0",
+    "prettier": "^3.5.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.24.0",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.0",
+    "vitest-axe": "^0.1.0"
+  }
+}

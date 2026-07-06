@@ -1,0 +1,222 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  font-family: var(--cl-font);
+  line-height: 1.55;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--cl-secondary);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--cl-radius-sm);
+  border: 1px solid var(--cl-border-strong);
+  background: var(--cl-bg-raised);
+  color: var(--cl-text);
+  padding: 0.5rem 1rem;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--cl-accent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--cl-accent);
+  outline-offset: 2px;
+}
+
+.cl-btn-primary {
+  background: var(--cl-accent);
+  border-color: var(--cl-accent);
+  color: var(--cl-accent-contrast);
+  font-weight: 600;
+}
+
+.cl-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.cl-btn-ghost {
+  background: transparent;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: var(--cl-text);
+  background: var(--cl-bg-inset);
+  border: 1px solid var(--cl-border);
+  border-radius: var(--cl-radius-sm);
+  padding: 0.4rem 0.6rem;
+}
+
+.cl-screen {
+  flex: 1;
+  width: 100%;
+  max-width: var(--cl-content-width);
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.cl-card {
+  background: var(--cl-bg-raised);
+  border: 1px solid var(--cl-border);
+  border-radius: var(--cl-radius);
+  padding: 1.25rem;
+}
+
+.cl-route {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cl-ship-header {
+  color: var(--cl-text-faint);
+  font-family: var(--cl-font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 0 0 0.25rem;
+}
+
+.cl-hint {
+  color: var(--cl-text-dim);
+  font-size: 0.9rem;
+}
+
+.cl-landing {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.cl-landing-title {
+  font-size: 2.6rem;
+  margin: 0.5rem 0;
+  color: var(--cl-accent);
+}
+
+.cl-tagline {
+  max-width: 34rem;
+  margin: 0 auto 2rem;
+  color: var(--cl-text-dim);
+}
+
+.cl-landing-ctas {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.cl-cta {
+  padding: 0.75rem 1.75rem;
+  font-size: 1.05rem;
+}
+
+.cl-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.cl-modal {
+  width: min(26rem, 90vw);
+  text-align: left;
+}
+
+.cl-auth-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.cl-toasts {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.cl-toast {
+  background: var(--cl-success);
+  color: var(--cl-accent-contrast);
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+}
+
+.cl-fade-in {
+  animation: cl-fade var(--cl-fade-ms) ease-in;
+}
+
+@keyframes cl-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cl-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
