@@ -73,6 +73,12 @@ export function resumeTimer(): void {
   persist();
 }
 
+/** Top up the target (used when continuing a session past the original box). */
+export function extendTimer(minutes: number): void {
+  targetMs.value += Math.max(0, minutes) * 60_000;
+  persist();
+}
+
 export function stopTimer(): void {
   pauseTimer();
   if (intervalId !== null) {

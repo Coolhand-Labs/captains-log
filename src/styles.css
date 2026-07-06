@@ -513,6 +513,109 @@ select {
   margin-top: 1rem;
 }
 
+/* ---- Reward screen ---- */
+
+.cl-reward {
+  position: relative;
+  text-align: center;
+}
+
+.cl-starfield {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cl-reward-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cl-reward-headline {
+  color: var(--cl-accent);
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+
+.cl-quip {
+  color: var(--cl-text-dim);
+  font-style: italic;
+  min-height: 2.5rem;
+}
+
+.cl-stat-cards {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.cl-stat-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 7.5rem;
+  padding: 0.9rem 1rem;
+}
+
+.cl-stat-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  font-family: var(--cl-font-mono);
+  color: var(--cl-accent);
+}
+
+.cl-stat-label {
+  color: var(--cl-text-dim);
+  font-size: 0.8rem;
+}
+
+.cl-sentiment-breakdown h2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.cl-sentiment-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  max-width: 24rem;
+  margin: 0 auto;
+  background: var(--cl-bg-inset);
+}
+
+.cl-bar-like {
+  background: var(--cl-success);
+}
+
+.cl-bar-neutral {
+  background: var(--cl-neutral);
+}
+
+.cl-bar-dislike {
+  background: var(--cl-danger);
+}
+
+.cl-fresh-offer {
+  margin: 1.5rem auto;
+  max-width: 26rem;
+}
+
+.cl-fresh-offer button {
+  margin-top: 0.5rem;
+}
+
+.cl-reward-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
 .cl-toasts {
   position: fixed;
   bottom: 1.25rem;

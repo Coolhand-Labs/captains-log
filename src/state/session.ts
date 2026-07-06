@@ -11,7 +11,7 @@ import { createDemoProvider } from '../services/demo/demo-provider';
 import { mulberry32, samplePlan } from '../services/sampling';
 import { runtimeConfig } from '../config/runtime-config';
 import { submitDraft } from '../services/api-client';
-import { startTimer, stopTimer, timeUp } from './timer';
+import { extendTimer, resumeTimer, startTimer, stopTimer, timeUp } from './timer';
 
 /** Active backend seam — demo provider or HTTP client, chosen at auth time. */
 export const provider = signal<ReviewQueueProvider | null>(null);
@@ -122,13 +122,15 @@ export type AdvanceResult = 'advanced' | 'session-complete';
 /**
  * The time box is soft (PRD §7.5): time-up never interrupts mid-item, it ends
  * the session at the next submit/skip boundary. Queue exhaustion ends immediately.
+ * The index always moves past the handled item so "continue with fresh items"
+ * resumes exactly where the session left off.
  */
 function advance(): AdvanceResult {
-  if (timeUp.value || currentIndex.value + 1 >= queue.value.length) {
+  currentIndex.value += 1;
+  if (timeUp.value || currentIndex.value >= queue.value.length) {
     stopTimer();
     return 'session-complete';
   }
-  currentIndex.value += 1;
   return 'advanced';
 }
 
@@ -153,6 +155,45 @@ export async function submitCurrentItem(): Promise<AdvanceResult> {
     },
   ];
   return advance();
+}
+
+/**
+ * Reward-screen continue check (PRD §7.5): re-query the window and return items
+ * not already in this session. Demo mode simulates arrivals so the flow is
+ * exercisable without a backend.
+ */
+export async function checkFreshItems(): Promise<ReviewItem[]> {
+  const p = provider.value;
+  const config = sessionConfig.value;
+  if (!p || !config) return [];
+
+  if (runtimeConfig.value.mode === 'demo' && 'simulateFreshArrivals' in p) {
+    (p as { simulateFreshArrivals(count?: number): void }).simulateFreshArrivals();
+  }
+
+  const seen = new Set(queue.value.map((i) => i.id));
+  const fresh: ReviewItem[] = [];
+  let offset: number | undefined = 0;
+  do {
+    const page = await p.fetchQueue({
+      time_window_start: config.windowStart,
+      time_window_end: new Date().toISOString(),
+      creator_unique_id: creatorUniqueId(),
+      exclude_reviewed_by_creator: true,
+      limit: 200,
+      offset,
+    });
+    fresh.push(...page.items.filter((i) => !seen.has(i.id)));
+    offset = page.has_more ? page.next_offset : undefined;
+  } while (offset !== undefined);
+  return fresh;
+}
+
+/** Append fresh items, top up the time box, and resume where the session stopped. */
+export function continueSession(freshItems: ReviewItem[]): void {
+  queue.value = [...queue.value, ...freshItems];
+  if (timeUp.value) extendTimer(Math.ceil(freshItems.length * 1.5));
+  resumeTimer();
 }
 
 /** Skip: logged, nothing submitted, item not marked reviewed (PRD §7.3). */
