@@ -166,6 +166,137 @@ select {
   margin: 1rem 0;
 }
 
+.cl-config-section {
+  margin-bottom: 1rem;
+}
+
+.cl-config-section h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+}
+
+.cl-choice-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cl-chip {
+  border: 1px solid var(--cl-border-strong);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  color: var(--cl-text-dim);
+}
+
+.cl-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cl-chip:has(input:focus-visible) {
+  outline: 2px solid var(--cl-accent);
+  outline-offset: 2px;
+}
+
+.cl-chip-active {
+  background: var(--cl-accent);
+  border-color: var(--cl-accent);
+  color: var(--cl-accent-contrast);
+  font-weight: 600;
+}
+
+.cl-custom-window,
+.cl-custom-minutes {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cl-workload-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+}
+
+.cl-workload-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--cl-border);
+}
+
+.cl-badge {
+  background: var(--cl-secondary);
+  color: var(--cl-accent-contrast);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  margin-left: 0.5rem;
+}
+
+.cl-preset-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.cl-rate-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+
+.cl-rate-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.cl-rate-pending {
+  color: var(--cl-text-faint);
+  font-size: 0.8rem;
+}
+
+.cl-rate-row input[type='range'] {
+  width: 10rem;
+}
+
+.cl-rate-pct {
+  font-family: var(--cl-font-mono);
+  min-width: 3ch;
+  text-align: right;
+}
+
+.cl-ab-toggle {
+  display: block;
+  margin: 0.75rem 0;
+  color: var(--cl-text-dim);
+}
+
+.cl-projection {
+  font-weight: 600;
+  color: var(--cl-accent);
+}
+
+.cl-config-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.cl-error {
+  color: var(--cl-danger);
+  font-weight: 600;
+}
+
 .cl-toasts {
   position: fixed;
   bottom: 1.25rem;

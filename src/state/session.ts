@@ -8,6 +8,9 @@ import {
   type CapturedFeedback,
 } from '../services/feedback-transport';
 import { createDemoProvider } from '../services/demo/demo-provider';
+import { mulberry32, samplePlan } from '../services/sampling';
+import { runtimeConfig } from '../config/runtime-config';
+import { startTimer } from './timer';
 
 /** Active backend seam — demo provider or HTTP client, chosen at auth time. */
 export const provider = signal<ReviewQueueProvider | null>(null);
@@ -46,9 +49,61 @@ export function discardDraft(itemId: string): void {
   drafts.value = next;
 }
 
+/** A/B arm per item when the session was started with an A/B split. */
+export const arms = signal<ReadonlyMap<string, 'A' | 'B'>>(new Map());
+
 export function startDemo(): void {
   provider.value = createDemoProvider();
   resetSession();
+}
+
+export function creatorUniqueId(): string {
+  return runtimeConfig.value.creatorId ?? 'demo-captain';
+}
+
+/**
+ * Build the session queue (PRD §7.2 Start): fetch the full window from the
+ * provider (all pages), apply the captain's sampling client-side, shuffle,
+ * optionally cap to the time box (Quick Start), and start the clock.
+ */
+export async function startSession(
+  config: SessionConfig,
+  opts: { cap?: number; seed?: number } = {},
+): Promise<void> {
+  const p = provider.value;
+  if (!p) throw new Error('No review-queue provider configured');
+
+  const items: ReviewItem[] = [];
+  let offset: number | undefined = 0;
+  do {
+    const page = await p.fetchQueue({
+      time_window_start: config.windowStart,
+      time_window_end: config.windowEnd,
+      creator_unique_id: creatorUniqueId(),
+      exclude_reviewed_by_creator: true,
+      limit: 200,
+      offset,
+    });
+    items.push(...page.items);
+    offset = page.has_more ? page.next_offset : undefined;
+  } while (offset !== undefined);
+
+  const rand = mulberry32(opts.seed ?? Date.now());
+  const plan = samplePlan(items, config.rates, rand, opts.cap);
+
+  sessionConfig.value = config;
+  queue.value = plan;
+  currentIndex.value = 0;
+  drafts.value = new Map();
+  submissions.value = [];
+  skips.value = [];
+  partialRoutes.clear();
+  mainRoutes.clear();
+  arms.value = config.abSplit
+    ? new Map(plan.map((item, i) => [item.id, i % 2 === 0 ? ('A' as const) : ('B' as const)]))
+    : new Map();
+
+  startTimer(config.targetMinutes);
 }
 
 export function resetSession(): void {
