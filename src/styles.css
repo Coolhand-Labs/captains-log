@@ -616,6 +616,30 @@ select {
   margin-top: 1.5rem;
 }
 
+.cl-custom-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border: 1px solid var(--cl-border);
+  border-radius: var(--cl-radius-sm);
+  padding: 0.75rem;
+}
+
+.cl-custom-auth label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--cl-text-dim);
+}
+
+.cl-remember {
+  display: block;
+  margin: 0.75rem 0;
+  color: var(--cl-text-dim);
+  font-size: 0.9rem;
+}
+
 .cl-toasts {
   position: fixed;
   bottom: 1.25rem;
