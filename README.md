@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open the printed URL and hit **Play Demo**. The demo is a starship captain reviewing AI-generated Starfleet reports — in-memory dummy data, no account, **zero network calls** (check the network tab). It exercises the entire flow: configuration → sampling → the review game → the reward screen.
+Open the printed URL and hit **Try Demo**. The demo is a starship captain reviewing AI-generated Starfleet reports — in-memory dummy data, no account, **zero network calls** (check the network tab). It exercises the entire flow: configuration → sampling → the review game → the reward screen.
 
 ## The flow
 

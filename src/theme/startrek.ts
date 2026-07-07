@@ -5,7 +5,7 @@ export const startrekTheme: Theme = {
   shipHeader: 'USS Coolhand · NCC-2047',
   landingTagline:
     'Move from babysitting AI turn-by-turn to reviewing final outputs — one at a time, time-boxed, with feedback that actually improves the process.',
-  landingDemoCta: 'Play Demo',
+  landingDemoCta: 'Try Demo',
   landingConnectCta: 'Connect Your Data',
   rewardHeadlines: [
     'Captain, the logs have been reviewed.',

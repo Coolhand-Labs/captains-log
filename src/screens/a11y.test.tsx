@@ -10,7 +10,6 @@ import { installFeedbackTransport } from '../services/feedback-transport';
 import { queue, currentIndex, resetSession, startDemo } from '../state/session';
 import { startTimer, stopTimer } from '../state/timer';
 import type { ReviewItem } from '../types/review';
-import { CollapsibleBlock } from '../components/CollapsibleBlock';
 
 const item: ReviewItem = {
   id: 'a11y-item',
@@ -70,42 +69,47 @@ describe('a11y: screens have no axe violations', () => {
 });
 
 describe('a11y: keyboard interaction', () => {
-  it('collapsible blocks toggle with correct aria-expanded state', () => {
-    const { getByRole, queryByText } = render(
-      <CollapsibleBlock label="View Prompt" content="the prompt text" />,
-    );
-    const button = getByRole('button', { name: /View Prompt/ });
-    expect(button.getAttribute('aria-expanded')).toBe('false');
-    expect(queryByText('the prompt text')).toBeNull();
-    fireEvent.click(button);
-    expect(button.getAttribute('aria-expanded')).toBe('true');
-    expect(queryByText('the prompt text')).not.toBeNull();
-  });
-
   it('sentiment buttons are a radiogroup reflecting the selection', () => {
     startDemo();
     queue.value = [item];
     currentIndex.value = 0;
     startTimer(20);
     const { getByRole } = render(<Review theme={startrekTheme} />);
-    const like = getByRole('radio', { name: /Like/ });
-    expect(like.getAttribute('aria-checked')).toBe('false');
-    fireEvent.click(like);
-    expect(like.getAttribute('aria-checked')).toBe('true');
+    const good = getByRole('radio', { name: /Good/ });
+    expect(good.getAttribute('aria-checked')).toBe('false');
+    fireEvent.click(good);
+    expect(good.getAttribute('aria-checked')).toBe('true');
     stopTimer();
   });
 
-  it('reference blocks for prompt and input data toggle independently', () => {
+  it('reference drawer shows prompt and input data independently', async () => {
     startDemo();
     queue.value = [item];
     currentIndex.value = 0;
     startTimer(20);
-    const { getByRole, queryByText } = render(<Review theme={startrekTheme} />);
-    fireEvent.click(getByRole('button', { name: /View Prompt/ }));
+    const { getByRole, queryByText, container } = render(<Review theme={startrekTheme} />);
+
+    // Hidden by default (PRD §7.3).
+    expect(queryByText('Summarize the away mission.')).toBeNull();
+    expect(queryByText(/mission_id/)).toBeNull();
+
+    // Open the prompt in the side drawer — output stays rendered.
+    fireEvent.click(getByRole('button', { name: 'View Prompt' }));
     expect(queryByText('Summarize the away mission.')).not.toBeNull();
     expect(queryByText(/mission_id/)).toBeNull();
-    fireEvent.click(getByRole('button', { name: /View Input Data/ }));
+    expect(queryByText(/All crew returned safely/)).not.toBeNull();
+
+    // Switch to input data inside the drawer.
+    fireEvent.click(getByRole('button', { name: 'Input Data' }));
     expect(queryByText(/mission_id/)).not.toBeNull();
+    expect(queryByText('Summarize the away mission.')).toBeNull();
+
+    // Drawer open state passes axe.
+    expect(await axe(container)).toHaveNoViolations();
+
+    // Close restores the hidden-by-default state.
+    fireEvent.click(getByRole('button', { name: 'Close' }));
+    expect(queryByText(/mission_id/)).toBeNull();
     stopTimer();
   });
 
