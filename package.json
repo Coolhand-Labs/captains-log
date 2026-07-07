@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coolhand-Labs/captainslog.git"
+    "url": "https://github.com/Coolhand-Labs/captains-log.git"
   },
   "scripts": {
     "dev": "vite",
