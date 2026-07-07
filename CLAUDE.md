@@ -41,4 +41,3 @@ Tests are **Vitest** (jsdom + @testing-library/preact + vitest-axe) — a delibe
 - `src/state/` — session (queue/drafts/submissions), timer, stats signals
 - `src/screens/` — Landing, AuthModal, Configure, Review, Reward
 - `src/theme/` — ALL Star Trek flavor copy (swap point)
-- `docs/coolhand-issues/` — drafts of the five Coolhand backend dependencies
