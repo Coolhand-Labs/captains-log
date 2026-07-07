@@ -9,14 +9,17 @@ const authModalOpen = signal(false);
 
 export function Landing({ theme }: { theme: Theme }): JSX.Element {
   return (
-    <main class="cl-screen cl-landing">
-      <p class="cl-ship-header">{theme.shipHeader}</p>
-      <h1 class="cl-landing-title">{theme.appName}</h1>
-      <p class="cl-tagline">{theme.landingTagline}</p>
+    <main class="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-5 pb-12 pt-6 text-center">
+      <p class="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        {theme.shipHeader}
+      </p>
+      <h1 class="my-2 text-5xl font-bold text-primary">{theme.appName}</h1>
+      <p class="mx-auto mb-8 max-w-xl text-muted-foreground">{theme.landingTagline}</p>
 
-      <div class="cl-landing-ctas">
+      <div class="mb-6 flex flex-wrap justify-center gap-4">
         <button
-          class="cl-btn-primary cl-cta"
+          class="btn"
+          data-size="lg"
           onClick={() => {
             startDemo();
             navigate('configure');
@@ -24,12 +27,17 @@ export function Landing({ theme }: { theme: Theme }): JSX.Element {
         >
           {theme.landingDemoCta}
         </button>
-        <button class="cl-cta" onClick={() => (authModalOpen.value = true)}>
+        <button
+          class="btn"
+          data-variant="outline"
+          data-size="lg"
+          onClick={() => (authModalOpen.value = true)}
+        >
           {theme.landingConnectCta}
         </button>
       </div>
 
-      <p class="cl-hint">
+      <p class="text-sm text-muted-foreground">
         The demo runs entirely in your browser with starship dummy data — no account, no network
         calls. Connect your data to review real workloads via Coolhand or your own backend.
       </p>

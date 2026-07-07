@@ -15,10 +15,11 @@ interface Props {
 
 /**
  * Auth entry point (PRD §6.1): Demo/none, Coolhand OAuth (ALWAYS offered),
- * or custom backend credentials.
+ * or custom backend credentials. Native <dialog> per Basecoat — modality,
+ * focus trapping, and Escape handling come from the platform.
  */
 export function AuthModal({ theme, onClose }: Props): JSX.Element {
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const [showCustom, setShowCustom] = useState(false);
   const [remember, setRemember] = useState(false);
   const [customUrl, setCustomUrl] = useState(runtimeConfig.value.reviewQueueUrl);
@@ -30,12 +31,12 @@ export function AuthModal({ theme, onClose }: Props): JSX.Element {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    dialogRef.current?.querySelector<HTMLElement>('button, input')?.focus();
-    return () => document.removeEventListener('keydown', onKey);
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    dialog.showModal();
+    // Native close (Escape, close()) unmounts the component via the parent signal.
+    dialog.addEventListener('close', onClose);
+    return () => dialog.removeEventListener('close', onClose);
   }, [onClose]);
 
   const connectCustom = () => {
@@ -57,32 +58,31 @@ export function AuthModal({ theme, onClose }: Props): JSX.Element {
   };
 
   return (
-    <div class="cl-modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div
-        ref={dialogRef}
-        class="cl-modal cl-card"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cl-auth-title"
-      >
-        <h2 id="cl-auth-title">Connect Your Data</h2>
-        <p class="cl-hint">
-          Choose how captainslog reads your review queue and where feedback goes.
-        </p>
+    <dialog
+      ref={dialogRef}
+      class="dialog"
+      aria-labelledby="cl-auth-title"
+      onClick={(e) => e.target === e.currentTarget && e.currentTarget.close()}
+    >
+      <div class="w-full sm:max-w-md">
+        <header>
+          <h2 id="cl-auth-title">Connect Your Data</h2>
+          <p>Choose how captainslog reads your review queue and where feedback goes.</p>
+        </header>
 
-        {authState.value.kind !== 'demo' && (
-          <p class="cl-hint">
-            Signed in ({authState.value.kind === 'coolhand_oauth' ? 'Coolhand' : 'custom backend'}
-            ).{' '}
-            <button class="cl-btn-ghost" onClick={() => signOut()}>
-              Sign out
-            </button>
-          </p>
-        )}
+        <section class="grid gap-3">
+          {authState.value.kind !== 'demo' && (
+            <p class="text-sm text-muted-foreground">
+              Signed in (
+              {authState.value.kind === 'coolhand_oauth' ? 'Coolhand' : 'custom backend'}).{' '}
+              <button class="btn" data-variant="link" data-size="sm" onClick={() => signOut()}>
+                Sign out
+              </button>
+            </p>
+          )}
 
-        <div class="cl-auth-options">
           <button
-            class="cl-btn-primary"
+            class="btn w-full"
             onClick={() => {
               const cfg = runtimeConfig.value;
               if (cfg.mode === 'demo') {
@@ -95,52 +95,74 @@ export function AuthModal({ theme, onClose }: Props): JSX.Element {
           </button>
 
           {!showCustom ? (
-            <button onClick={() => setShowCustom(true)}>Custom backend (API key)</button>
+            <button class="btn w-full" data-variant="outline" onClick={() => setShowCustom(true)}>
+              Custom backend (API key)
+            </button>
           ) : (
-            <div class="cl-custom-auth">
-              <label>
-                Review-queue URL
+            <div class="grid gap-3 rounded-lg border border-border p-3">
+              <div class="grid gap-1.5">
+                <label class="label" for="cl-auth-url">
+                  Review-queue URL
+                </label>
                 <input
+                  id="cl-auth-url"
+                  class="input"
                   type="url"
                   placeholder="https://your-backend.example.com/captain/review-queue"
                   value={customUrl}
                   onInput={(e) => setCustomUrl(e.currentTarget.value)}
                 />
-              </label>
-              <label>
-                Feedback URL <span class="cl-hint">(defaults to the review-queue URL)</span>
+              </div>
+              <div class="grid gap-1.5">
+                <label class="label" for="cl-auth-feedback-url">
+                  Feedback URL{' '}
+                  <span class="font-normal text-muted-foreground">
+                    (defaults to the review-queue URL)
+                  </span>
+                </label>
                 <input
+                  id="cl-auth-feedback-url"
+                  class="input"
                   type="url"
                   value={customFeedbackUrl}
                   onInput={(e) => setCustomFeedbackUrl(e.currentTarget.value)}
                 />
-              </label>
-              <label>
-                Credential
+              </div>
+              <div class="grid gap-1.5">
+                <label class="label" for="cl-auth-credential">
+                  Credential
+                </label>
                 <input
+                  id="cl-auth-credential"
+                  class="input"
                   type="password"
                   value={credential}
                   onInput={(e) => setCredential(e.currentTarget.value)}
                 />
-              </label>
-              <label>
-                Sent as{' '}
+              </div>
+              <div class="grid gap-1.5">
+                <label class="label" for="cl-auth-scheme">
+                  Sent as
+                </label>
                 <select
+                  id="cl-auth-scheme"
+                  class="select"
                   value={scheme}
                   onChange={(e) => setScheme(e.currentTarget.value as 'x-api-key' | 'bearer')}
                 >
                   <option value="x-api-key">X-API-Key header</option>
                   <option value="bearer">Authorization: Bearer</option>
                 </select>
-              </label>
-              <button class="cl-btn-primary" onClick={connectCustom}>
+              </div>
+              <button class="btn" onClick={connectCustom}>
                 Connect
               </button>
             </div>
           )}
 
           <button
-            class="cl-btn-ghost"
+            class="btn w-full"
+            data-variant="ghost"
             onClick={() => {
               startDemo();
               onClose();
@@ -149,27 +171,34 @@ export function AuthModal({ theme, onClose }: Props): JSX.Element {
           >
             {theme.landingDemoCta} instead
           </button>
-        </div>
 
-        <label class="cl-remember">
-          <input
-            type="checkbox"
-            checked={remember}
-            onChange={(e) => setRemember(e.currentTarget.checked)}
-          />{' '}
-          Remember me on this device
-        </label>
+          <label class="label gap-2">
+            <input
+              class="input"
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.currentTarget.checked)}
+            />
+            Remember me on this device
+          </label>
 
-        {error && (
-          <p class="cl-error" role="alert">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p class="text-sm font-medium text-destructive" role="alert">
+              {error}
+            </p>
+          )}
+        </section>
 
-        <button class="cl-btn-ghost" onClick={onClose}>
-          Cancel
-        </button>
+        <footer>
+          <button
+            class="btn"
+            data-variant="outline"
+            onClick={() => dialogRef.current?.close()}
+          >
+            Cancel
+          </button>
+        </footer>
       </div>
-    </div>
+    </dialog>
   );
 }

@@ -72,7 +72,7 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
   };
 
   return (
-    <main class="cl-screen cl-review">
+    <main class="mx-auto w-full max-w-2xl flex-1 px-5 pb-12 pt-6">
       <SessionHeader
         theme={theme}
         workloadName={item.workload_name}
@@ -82,28 +82,29 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
       />
 
       {isPaused.value && (
-        <div class="cl-pause-overlay">
+        <div class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-background/85 text-lg">
           <p>Session paused.</p>
-          <button class="cl-btn-primary" onClick={resumeTimer}>
+          <button class="btn" onClick={resumeTimer}>
             ▶ Resume
           </button>
         </div>
       )}
 
-      <div class={isPaused.value ? 'cl-paused-content' : ''}>
+      <div class={isPaused.value ? 'pointer-events-none select-none blur-[2px]' : ''}>
         {/* Remount per item so widget attachments and fades reset cleanly. */}
         <OutputPanel key={item.id} item={item} />
 
         <ReferenceBlocks item={item} />
 
-        <section class="cl-feedback-controls" aria-label="Your feedback">
-          <div role="radiogroup" aria-label="Overall sentiment" class="cl-sentiment-row">
+        <section class="my-4" aria-label="Your feedback">
+          <div role="radiogroup" aria-label="Overall sentiment" class="mb-3 flex gap-2">
             {SENTIMENTS.map((s) => (
               <button
                 key={s.value}
                 role="radio"
                 aria-checked={draft.sentiment === s.value}
-                class={`cl-sentiment-btn ${draft.sentiment === s.value ? 'cl-sentiment-active' : ''}`}
+                class="btn"
+                data-variant={draft.sentiment === s.value ? undefined : 'outline'}
                 onClick={() =>
                   updateDraft(item.id, {
                     sentiment: draft.sentiment === s.value ? undefined : s.value,
@@ -115,9 +116,12 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
             ))}
           </div>
 
-          <label class="cl-explanation-label">
-            Explanation <span class="cl-hint">(optional)</span>
+          <label class="label w-full flex-col items-start gap-1.5">
+            <span>
+              Explanation <span class="font-normal text-muted-foreground">(optional)</span>
+            </span>
             <textarea
+              class="textarea w-full"
               rows={3}
               value={draft.explanation ?? ''}
               placeholder={EXPLANATION_PLACEHOLDER[draft.sentiment ?? 'none']}
@@ -129,17 +133,18 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
         <WarningBanner />
 
         {error && (
-          <p class="cl-error" role="alert">
+          <p class="font-medium text-destructive" role="alert">
             {error}
           </p>
         )}
 
-        <div class="cl-review-actions">
-          <button class="cl-btn-primary cl-cta" disabled={submitting} onClick={onSubmit}>
+        <div class="mt-4 flex items-center gap-3">
+          <button class="btn" data-size="lg" disabled={submitting} onClick={onSubmit}>
             {submitting ? 'Submitting…' : error ? 'Retry Submit' : 'Submit & Next'}
           </button>
           <button
-            class="cl-btn-ghost"
+            class="btn"
+            data-variant="ghost"
             disabled={submitting}
             onClick={() => finish(skipCurrentItem())}
           >
@@ -153,10 +158,13 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
 
 function ReferenceBlocks({ item }: { item: ReviewItem }): JSX.Element {
   return (
-    <section class="cl-reference" aria-label="Reference: what was this supposed to do?">
+    <section class="my-3" aria-label="Reference: what was this supposed to do?">
       {item.prompt !== undefined && <CollapsibleBlock label="View Prompt" content={item.prompt} />}
       {item.input_data !== undefined && (
-        <CollapsibleBlock label="View Input Data" content={JSON.stringify(item.input_data, null, 2)} />
+        <CollapsibleBlock
+          label="View Input Data"
+          content={JSON.stringify(item.input_data, null, 2)}
+        />
       )}
     </section>
   );

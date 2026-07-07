@@ -41,6 +41,30 @@ function windowBounds(
   };
 }
 
+/** Radio styled as a Basecoat button — selected = solid primary, rest = outline. */
+function ChoiceChip({
+  name,
+  checked,
+  onSelect,
+  children,
+}: {
+  name: string;
+  checked: boolean;
+  onSelect: () => void;
+  children: JSX.Element | string;
+}): JSX.Element {
+  return (
+    <label
+      class="btn has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
+      data-variant={checked ? undefined : 'outline'}
+      data-size="sm"
+    >
+      <input type="radio" name={name} class="sr-only" checked={checked} onChange={onSelect} />
+      {children}
+    </label>
+  );
+}
+
 export function Configure({ theme }: { theme: Theme }): JSX.Element {
   const [windowChoice, setWindowChoice] = useState<WindowChoice>('24h');
   const [customStart, setCustomStart] = useState('');
@@ -105,136 +129,197 @@ export function Configure({ theme }: { theme: Theme }): JSX.Element {
   }
 
   return (
-    <main class="cl-screen">
-      <p class="cl-ship-header">{theme.shipHeader}</p>
-      <h1>Configure Session</h1>
+    <main class="mx-auto w-full max-w-2xl flex-1 px-5 pb-12 pt-6">
+      <p class="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        {theme.shipHeader}
+      </p>
+      <h1 class="mb-4 mt-1 text-3xl font-bold">Configure Session</h1>
 
-      <section class="cl-card cl-config-section" aria-labelledby="cfg-window">
-        <h2 id="cfg-window">Review window</h2>
-        <div class="cl-choice-row" role="radiogroup" aria-labelledby="cfg-window">
-          {(['4h', '24h', '7d', 'custom'] as const).map((choice) => (
-            <label key={choice} class={`cl-chip ${windowChoice === choice ? 'cl-chip-active' : ''}`}>
-              <input
-                type="radio"
+      <section class="card mb-4" aria-labelledby="cfg-window">
+        <header>
+          <h2 id="cfg-window">Review window</h2>
+        </header>
+        <section>
+          <div class="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="cfg-window">
+            {(['4h', '24h', '7d', 'custom'] as const).map((choice) => (
+              <ChoiceChip
+                key={choice}
                 name="window"
                 checked={windowChoice === choice}
-                onChange={() => setWindowChoice(choice)}
-              />
-              {choice === 'custom' ? 'Custom' : `Last ${choice.replace('h', ' hours').replace('d', ' days')}`}
-            </label>
-          ))}
-        </div>
-        {windowChoice === 'custom' && (
-          <div class="cl-custom-window">
-            <label>
-              From{' '}
-              <input
-                type="datetime-local"
-                value={customStart}
-                onInput={(e) => setCustomStart(e.currentTarget.value)}
-              />
-            </label>
-            <label>
-              To{' '}
-              <input
-                type="datetime-local"
-                value={customEnd}
-                onInput={(e) => setCustomEnd(e.currentTarget.value)}
-              />
-            </label>
+                onSelect={() => setWindowChoice(choice)}
+              >
+                {choice === 'custom'
+                  ? 'Custom'
+                  : `Last ${choice.replace('h', ' hours').replace('d', ' days')}`}
+              </ChoiceChip>
+            ))}
           </div>
-        )}
+          {windowChoice === 'custom' && (
+            <div class="mt-3 flex flex-wrap gap-4">
+              <label class="label gap-2">
+                From{' '}
+                <input
+                  class="input"
+                  type="datetime-local"
+                  value={customStart}
+                  onInput={(e) => setCustomStart(e.currentTarget.value)}
+                />
+              </label>
+              <label class="label gap-2">
+                To{' '}
+                <input
+                  class="input"
+                  type="datetime-local"
+                  value={customEnd}
+                  onInput={(e) => setCustomEnd(e.currentTarget.value)}
+                />
+              </label>
+            </div>
+          )}
+        </section>
       </section>
 
-      <section class="cl-card cl-config-section" aria-labelledby="cfg-target">
-        <h2 id="cfg-target">How long do you want to review today?</h2>
-        <div class="cl-choice-row" role="radiogroup" aria-labelledby="cfg-target">
-          {([20, 60, 120, 'custom'] as const).map((choice) => (
-            <label key={choice} class={`cl-chip ${targetChoice === choice ? 'cl-chip-active' : ''}`}>
-              <input
-                type="radio"
+      <section class="card mb-4" aria-labelledby="cfg-target">
+        <header>
+          <h2 id="cfg-target">How long do you want to review today?</h2>
+        </header>
+        <section>
+          <div class="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="cfg-target">
+            {([20, 60, 120, 'custom'] as const).map((choice) => (
+              <ChoiceChip
+                key={choice}
                 name="target"
                 checked={targetChoice === choice}
-                onChange={() => setTargetChoice(choice)}
+                onSelect={() => setTargetChoice(choice)}
+              >
+                {choice === 'custom'
+                  ? 'Custom'
+                  : choice === 20
+                    ? '20 min'
+                    : `${choice / 60} hour${choice > 60 ? 's' : ''}`}
+              </ChoiceChip>
+            ))}
+          </div>
+          {targetChoice === 'custom' && (
+            <label class="label mt-3 gap-2">
+              Minutes{' '}
+              <input
+                class="input w-24"
+                type="number"
+                min={5}
+                max={480}
+                value={customMinutes}
+                onInput={(e) => setCustomMinutes(Math.max(5, Number(e.currentTarget.value) || 5))}
               />
-              {choice === 'custom' ? 'Custom' : choice === 20 ? '20 min' : `${choice / 60} hour${choice > 60 ? 's' : ''}`}
             </label>
-          ))}
-        </div>
-        {targetChoice === 'custom' && (
-          <label class="cl-custom-minutes">
-            Minutes{' '}
-            <input
-              type="number"
-              min={5}
-              max={480}
-              value={customMinutes}
-              onInput={(e) => setCustomMinutes(Math.max(5, Number(e.currentTarget.value) || 5))}
-            />
-          </label>
-        )}
+          )}
+        </section>
       </section>
 
-      <section class="cl-card cl-config-section" aria-labelledby="cfg-workloads">
-        <h2 id="cfg-workloads">Workloads</h2>
-        {workloads.value.length === 0 ? (
-          <p class="cl-hint">No reviewable items in this window.</p>
-        ) : !customizing ? (
-          <>
-            <ul class="cl-workload-list">
+      <section class="card mb-4" aria-labelledby="cfg-workloads">
+        <header>
+          <h2 id="cfg-workloads">Workloads</h2>
+        </header>
+        <section>
+          {workloads.value.length === 0 ? (
+            <p class="text-sm text-muted-foreground">No reviewable items in this window.</p>
+          ) : !customizing ? (
+            <>
+              <ul class="mb-3">
+                {workloads.value.map((w) => (
+                  <li
+                    key={w.id}
+                    class="flex items-center justify-between gap-4 border-b border-border py-2 last:border-b-0"
+                  >
+                    <span class="flex items-center gap-2">
+                      {w.name}
+                      {w.experimental && (
+                        <span class="badge" data-variant="secondary">
+                          experimental
+                        </span>
+                      )}
+                    </span>
+                    <span class="text-sm text-muted-foreground">{w.pending_count} pending</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                class="btn"
+                data-variant="ghost"
+                data-size="sm"
+                onClick={() => setCustomizing(true)}
+              >
+                Customize sampling…
+              </button>
+            </>
+          ) : (
+            <>
+              <div class="mb-4 flex flex-wrap gap-2">
+                <button
+                  class="btn"
+                  data-variant="outline"
+                  data-size="sm"
+                  onClick={() => setRates(presetEverything(workloads.value))}
+                >
+                  Everything
+                </button>
+                <button
+                  class="btn"
+                  data-variant="outline"
+                  data-size="sm"
+                  onClick={() => setRates(presetBalanced(workloads.value, targetMinutes))}
+                >
+                  Balance Across All
+                </button>
+                <button
+                  class="btn"
+                  data-variant="outline"
+                  data-size="sm"
+                  onClick={() => setRates(presetExperimental(workloads.value, targetMinutes))}
+                >
+                  Priority to Experimental
+                </button>
+              </div>
               {workloads.value.map((w) => (
-                <li key={w.id}>
-                  <span>
-                    {w.name}
-                    {w.experimental && <span class="cl-badge">experimental</span>}
-                  </span>
-                  <span class="cl-rate-pending">{w.pending_count} pending</span>
-                </li>
+                <RateSlider
+                  key={w.id}
+                  id={w.id}
+                  label={w.name}
+                  pendingCount={w.pending_count}
+                  experimental={w.experimental}
+                  rate={rates[w.id] ?? 1}
+                  onChange={(rate) => setRates((prev) => ({ ...prev, [w.id]: rate }))}
+                />
               ))}
-            </ul>
-            <button class="cl-btn-ghost" onClick={() => setCustomizing(true)}>
-              Customize sampling…
-            </button>
-          </>
-        ) : (
-          <>
-            <div class="cl-preset-row">
-              <button onClick={() => setRates(presetEverything(workloads.value))}>Everything</button>
-              <button onClick={() => setRates(presetBalanced(workloads.value, targetMinutes))}>
-                Balance Across All
-              </button>
-              <button onClick={() => setRates(presetExperimental(workloads.value, targetMinutes))}>
-                Priority to Experimental
-              </button>
-            </div>
-            {workloads.value.map((w) => (
-              <RateSliderRow key={w.id} workloadId={w.id} rates={rates} setRates={setRates} />
-            ))}
-            <label class="cl-ab-toggle">
-              <input
-                type="checkbox"
-                checked={abSplit}
-                onChange={(e) => setAbSplit(e.currentTarget.checked)}
-              />{' '}
-              A/B split (tag items into two arms for head-to-head comparison)
-            </label>
-            <p class="cl-projection" aria-live="polite">
-              At these settings you’ll review ~{projection.items} items (~{projection.minutes} min).
-            </p>
-          </>
-        )}
+              <label class="label my-3 gap-2 text-muted-foreground">
+                <input
+                  class="input"
+                  type="checkbox"
+                  checked={abSplit}
+                  onChange={(e) => setAbSplit(e.currentTarget.checked)}
+                />
+                A/B split (tag items into two arms for head-to-head comparison)
+              </label>
+              <p class="font-semibold text-primary" aria-live="polite">
+                At these settings you’ll review ~{projection.items} items (~{projection.minutes}{' '}
+                min).
+              </p>
+            </>
+          )}
+        </section>
       </section>
 
       {error && (
-        <p class="cl-error" role="alert">
+        <p class="mb-3 font-medium text-destructive" role="alert">
           {error}
         </p>
       )}
 
-      <div class="cl-config-actions">
+      <div class="flex items-center gap-4">
         {!customizing ? (
           <button
-            class="cl-btn-primary cl-cta"
+            class="btn"
+            data-size="lg"
             disabled={starting || totalPending === 0}
             onClick={() => begin(presetEverything(workloads.value), quickStartCount)}
           >
@@ -242,40 +327,18 @@ export function Configure({ theme }: { theme: Theme }): JSX.Element {
           </button>
         ) : (
           <button
-            class="cl-btn-primary cl-cta"
+            class="btn"
+            data-size="lg"
             disabled={starting || projection.items === 0}
             onClick={() => begin(rates)}
           >
             {starting ? 'Preparing…' : 'Start Session'}
           </button>
         )}
-        <button class="cl-btn-ghost" onClick={() => navigate('landing')}>
+        <button class="btn" data-variant="ghost" onClick={() => navigate('landing')}>
           Back
         </button>
       </div>
     </main>
-  );
-}
-
-function RateSliderRow({
-  workloadId,
-  rates,
-  setRates,
-}: {
-  workloadId: string;
-  rates: SamplingRates;
-  setRates: (fn: (prev: SamplingRates) => SamplingRates) => void;
-}): JSX.Element | null {
-  const w = workloads.value.find((x) => x.id === workloadId);
-  if (!w) return null;
-  return (
-    <RateSlider
-      id={w.id}
-      label={w.name}
-      pendingCount={w.pending_count}
-      experimental={w.experimental}
-      rate={rates[w.id] ?? 1}
-      onChange={(rate) => setRates((prev) => ({ ...prev, [w.id]: rate }))}
-    />
   );
 }

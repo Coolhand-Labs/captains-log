@@ -41,6 +41,10 @@ Open the printed URL and hit **Play Demo**. The demo is a starship captain revie
 
 The feedback payload is **identical to Coolhand's `POST /llm_request_log_feedbacks` schema**, so self-hosted and Coolhand-backed deployments are interchangeable — `both` mode simply POSTs the same body twice. See [API.md](API.md) for the exact contracts a self-hosted backend implements (reproduce the endpoint names and shapes verbatim and captainslog is drop-in), and [CONFIGURATION.md](CONFIGURATION.md) for deployment setup.
 
+## UI: shadcn design system via Basecoat
+
+The UX is standardized on the [shadcn/ui](https://ui.shadcn.com) design system through [Basecoat](https://basecoatui.com) — shadcn's components as framework-agnostic Tailwind CSS, so the app stays Preact + signals with no React/Radix runtime. Components use Basecoat classes (`btn`, `card`, `input`, `dialog`, `toaster`, …); the Star Trek look is just shadcn CSS variables in `src/theme/trek.css`, so any shadcn-compatible theme (ui.shadcn.com/themes, tweakcn) is a drop-in reskin.
+
 ## Built on coolhand-js
 
 captainslog is a thin orchestration layer over [coolhand-js](https://github.com/Coolhand-Labs/coolhand-js) primitives: passive edit capture (`revised_output`), highlight-and-annotate section feedback (`focus_range`/`focus_section`), and sentiment. New generally-useful UI built here should be upstreamed — see [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
+import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 import { mockOAuthPlugin } from './src/services/auth/mock-oauth-plugin';
 
@@ -9,7 +10,7 @@ const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 
 };
 
 export default defineConfig({
-  plugins: [preact(), mockOAuthPlugin()],
+  plugins: [preact(), tailwindcss(), mockOAuthPlugin()],
   define: {
     __CAPTAINSLOG_VERSION__: JSON.stringify(pkg.version),
   },

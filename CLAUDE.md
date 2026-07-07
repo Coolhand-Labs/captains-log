@@ -6,6 +6,10 @@ Guidance for Claude Code when working in this repository.
 
 captainslog — a frontend-only SPA (Preact + Vite + TypeScript, `@preact/signals` state, hand-rolled hash router) that gamifies time-boxed human review of AI outputs. Feedback capture reuses **coolhand-js** widgets; see README.md and API.md for product and contract details.
 
+## Styling
+
+The UI is the **shadcn design system via Basecoat** (`basecoat-css` + Tailwind v4, `@tailwindcss/vite` plugin) — no React/Radix. Use Basecoat classes (`btn` with `data-variant`/`data-size`, `card`, `input`, `textarea`, `label`, `badge`, `alert`, `button-group`, `dialog` on native `<dialog>`, `toaster`/`toast`) plus Tailwind utilities; do not reintroduce bespoke `cl-*` component CSS. Theme = shadcn CSS variables in `src/theme/trek.css` (any shadcn-compatible theme drops in); the few custom rules that remain (starfield, route fade) live in `src/styles.css`. Markdown renders with `prose prose-invert` (typography plugin). jsdom lacks modal dialogs — `test-setup.ts` shims `showModal`/`close`.
+
 ## Setup
 
 The `coolhand` dependency is a `file:` symlink to `../sdks/coolhand-js` and ships a prebuilt UMD bundle. If `dist/coolhand.js` there is missing or stale:

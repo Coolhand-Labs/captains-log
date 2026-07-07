@@ -12,6 +12,9 @@ import {
 
 type PanelMode = 'annotate' | 'edit';
 
+/** AI text visually delineated from UI chrome (PRD §7.3). */
+const OUTPUT_SURFACE = 'rounded-lg border border-science/50 bg-card px-5 py-4';
+
 /**
  * The AI output under review (PRD §7.3). Two mutually exclusive modes backed
  * by coolhand-js primitives (one element can't host both — see coolhand-adapter):
@@ -42,25 +45,29 @@ export function OutputPanel({ item }: { item: ReviewItem }): JSX.Element {
   }, [mode, item.id]);
 
   return (
-    <section class="cl-output-panel" aria-label="AI output under review">
-      <div class="cl-output-toolbar">
-        <div role="group" aria-label="Output mode" class="cl-mode-toggle">
+    <section class="mb-4" aria-label="AI output under review">
+      <div class="mb-2 flex flex-wrap items-center gap-3">
+        <div role="group" aria-label="Output mode" class="button-group">
           <button
+            class="btn"
+            data-variant={mode === 'annotate' ? undefined : 'outline'}
+            data-size="sm"
             aria-pressed={mode === 'annotate'}
-            class={mode === 'annotate' ? 'cl-mode-active' : ''}
             onClick={() => setMode('annotate')}
           >
             Annotate
           </button>
           <button
+            class="btn"
+            data-variant={mode === 'edit' ? undefined : 'outline'}
+            data-size="sm"
             aria-pressed={mode === 'edit'}
-            class={mode === 'edit' ? 'cl-mode-active' : ''}
             onClick={() => setMode('edit')}
           >
             Edit
           </button>
         </div>
-        <span class="cl-hint">
+        <span class="text-sm text-muted-foreground">
           {mode === 'annotate'
             ? 'Select any passage to comment on it.'
             : 'Edit the output directly — changes are captured as your revision.'}
@@ -73,13 +80,13 @@ export function OutputPanel({ item }: { item: ReviewItem }): JSX.Element {
       {mode === 'annotate' ? (
         <div
           ref={annotateRef}
-          class="cl-markdown cl-output-body"
+          class={`prose prose-invert max-w-none ${OUTPUT_SURFACE}`}
           dangerouslySetInnerHTML={{ __html: html }}
         />
       ) : (
         <textarea
           ref={editRef}
-          class="cl-output-editor"
+          class={`textarea w-full resize-y font-mono text-sm ${OUTPUT_SURFACE}`}
           rows={16}
           value={draft.revised_output ?? item.original_output}
           onInput={(e) => updateDraft(item.id, { revised_output: e.currentTarget.value })}
@@ -88,7 +95,7 @@ export function OutputPanel({ item }: { item: ReviewItem }): JSX.Element {
       )}
 
       {draft.partials.length > 0 && (
-        <p class="cl-hint" aria-live="polite">
+        <p class="mt-2 text-sm text-muted-foreground" aria-live="polite">
           {draft.partials.length} section annotation{draft.partials.length === 1 ? '' : 's'} on
           this item.
         </p>

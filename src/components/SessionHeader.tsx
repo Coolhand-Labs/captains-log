@@ -28,40 +28,45 @@ export function SessionHeader({
   const pct = total === 0 ? 0 : Math.round((position / total) * 100);
   const created = new Date(createdAt);
   return (
-    <header class={`cl-session-header ${timeUp.value ? 'cl-time-up' : ''}`}>
-      <div class="cl-session-meta">
+    <header class="mb-4 border-b border-border pb-3">
+      <div class="flex flex-wrap items-center gap-3">
         <button
-          class="cl-btn-ghost"
+          class="btn"
+          data-variant="ghost"
+          data-size="sm"
           onClick={() => (isPaused.value ? resumeTimer() : pauseTimer())}
           aria-pressed={isPaused.value}
         >
           {isPaused.value ? '▶ Resume' : '⏸ Pause'}
         </button>
-        <span class="cl-workload-label">{workloadName}</span>
-        <time dateTime={createdAt} class="cl-created-at">
+        <span class="font-bold text-science">{workloadName}</span>
+        <time dateTime={createdAt} class="text-xs text-muted-foreground">
           {created.toLocaleString()}
         </time>
       </div>
-      <div class="cl-session-progress">
+      <div class="mt-2 flex items-center gap-3 text-sm">
         <span>
           {position} of {total}
         </span>
         <div
-          class="cl-progress-bar"
+          class="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"
           role="progressbar"
           aria-valuenow={position}
           aria-valuemin={0}
           aria-valuemax={total}
           aria-label="Session progress"
         >
-          <div class="cl-progress-fill" style={{ width: `${pct}%` }} />
+          <div
+            class="h-full bg-primary transition-[width] duration-200"
+            style={{ width: `${pct}%` }}
+          />
         </div>
-        <span class={`cl-clock ${timeUp.value ? 'cl-clock-over' : ''}`}>
+        <span class={`font-mono ${timeUp.value ? 'font-bold text-destructive' : ''}`}>
           {formatClock(elapsedMs.value)} / {targetMinutes.value} min
         </span>
       </div>
       {timeUp.value && (
-        <p class="cl-time-up-banner" role="status">
+        <p class="mt-2 font-medium text-destructive" role="status">
           {theme.timeUpMessage}
         </p>
       )}

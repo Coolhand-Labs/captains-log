@@ -31,5 +31,5 @@ Current candidates:
 - **Only the coolhand default singleton is real.** `import coolhand from 'coolhand'` — never value-import named exports (an ESLint rule enforces this).
 - **Widgets never reach the network.** All widget traffic is intercepted by `feedback-transport.ts` into per-item drafts; real submission happens only in `feedback-encoder.ts` on Submit & Next. Demo mode must stay zero-network.
 - **Bias prevention is structural.** Items pass through `sanitizeItem()`'s whitelist; model/provider/token/temperature fields must never gain a rendering path.
-- **Theme is flavor only.** All Star Trek copy lives behind the `Theme` interface (`src/theme/`); screens must not hardcode it.
+- **Theme is flavor only.** All Star Trek copy lives behind the `Theme` interface (`src/theme/`); screens must not hardcode it. Visuals are the shadcn design system via Basecoat — palette changes belong in `src/theme/trek.css` (shadcn CSS variables), not in component markup.
 - **WCAG 2.1 AA.** Every interactive element keyboard-reachable, axe tests green (`npm test`), `prefers-reduced-motion` respected.

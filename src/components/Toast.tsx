@@ -17,12 +17,23 @@ export function showToast(text: string, durationMs = 1500): void {
   }, durationMs);
 }
 
+/** Basecoat toaster anatomy; lifecycle stays Preact-managed (no Basecoat JS). */
 export function ToastHost(): JSX.Element {
   return (
-    <div class="cl-toasts" role="status" aria-live="polite">
+    <div class="toaster">
       {toasts.value.map((t) => (
-        <div key={t.id} class="cl-toast cl-fade-in">
-          {t.text}
+        <div
+          key={t.id}
+          class="toast cl-fade-in"
+          role="status"
+          aria-atomic="true"
+          data-category="success"
+        >
+          <div class="toast-content">
+            <section>
+              <h2>{t.text}</h2>
+            </section>
+          </div>
         </div>
       ))}
     </div>

@@ -1,0 +1,42 @@
+/*
+ * Star Trek demo theme, expressed as standard shadcn/ui design-system variables
+ * (consumed by Basecoat). Swapping the app's look = replacing this file with any
+ * shadcn-compatible theme (ui.shadcn.com/themes, tweakcn, etc.).
+ *
+ * captainslog is dark-only by design, so the palette lives on :root directly.
+ */
+:root {
+  --background: #0b0e1a;
+  --foreground: #e8ecf8;
+
+  --card: #141a2e;
+  --card-foreground: #e8ecf8;
+  --popover: #141a2e;
+  --popover-foreground: #e8ecf8;
+
+  /* Command gold */
+  --primary: #f5b83d;
+  --primary-foreground: #10131f;
+
+  --secondary: #1d2542;
+  --secondary-foreground: #e8ecf8;
+
+  --muted: #171d33;
+  --muted-foreground: #9aa5c8;
+
+  --accent: #222a4c;
+  --accent-foreground: #e8ecf8;
+
+  --destructive: #e4574f;
+
+  --border: #2a3352;
+  --input: #2a3352;
+  --ring: #f5b83d;
+
+  --radius: 0.625rem;
+
+  /* Science blue — used for workload labels / reference links */
+  --science: #5da9f6;
+  /* Session-stat green */
+  --success: #4fc38a;
+}

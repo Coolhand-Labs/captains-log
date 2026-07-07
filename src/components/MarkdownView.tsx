@@ -16,6 +16,9 @@ export function renderMarkdown(markdown: string): string {
 export function MarkdownView({ markdown, class: className }: Props): JSX.Element {
   const html = useMemo(() => renderMarkdown(markdown), [markdown]);
   return (
-    <div class={`cl-markdown ${className ?? ''}`} dangerouslySetInnerHTML={{ __html: html }} />
+    <div
+      class={`prose prose-invert max-w-none ${className ?? ''}`}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }

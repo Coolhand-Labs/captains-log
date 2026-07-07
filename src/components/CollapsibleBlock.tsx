@@ -14,9 +14,10 @@ export function CollapsibleBlock({ label, content }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const regionId = useId();
   return (
-    <div class="cl-collapsible">
+    <div>
       <button
-        class="cl-btn-ghost cl-collapsible-toggle"
+        class="btn px-0 text-science"
+        data-variant="link"
         aria-expanded={open}
         aria-controls={regionId}
         onClick={() => setOpen(!open)}
@@ -24,7 +25,11 @@ export function CollapsibleBlock({ label, content }: Props): JSX.Element {
         <span aria-hidden="true">{open ? '▾' : '▸'}</span> {label}
       </button>
       {open && (
-        <pre id={regionId} class="cl-collapsible-body" tabindex={0}>
+        <pre
+          id={regionId}
+          class="mb-2 max-h-80 overflow-auto whitespace-pre-wrap rounded-md border border-border bg-muted p-4 font-mono text-[0.82rem]"
+          tabindex={0}
+        >
           {content}
         </pre>
       )}

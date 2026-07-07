@@ -6,7 +6,6 @@ import { handleOAuthCallback } from './services/auth/oauth';
 import { authState, restoreAuthState } from './services/auth/auth';
 import { createHttpProvider } from './services/api-client';
 import { provider } from './state/session';
-import './theme/tokens.css';
 import './styles.css';
 
 async function boot(): Promise<void> {
