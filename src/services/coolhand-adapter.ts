@@ -1,15 +1,17 @@
 import coolhand from 'coolhand';
 import type { ReviewItem } from '../types/review';
 import { runtimeConfig } from '../config/runtime-config';
+import { WIDGET_CAPTURE_URL } from '../config/constants';
 import { creatorUniqueId } from '../state/session';
 
 /**
  * Thin lifecycle layer over the coolhand-js singleton (the UMD bundle exposes
  * ONLY its default export — never value-import named exports).
  *
- * Widgets are used purely for capture UI; their network calls are intercepted
- * by feedback-transport.ts, so the api key passed to init() is inert for
- * widget traffic (real submission auth lives in feedback-encoder.ts).
+ * Widgets are used purely for capture UI: init() points them at the local
+ * capture sentinel via the SDK's `apiUrl` option, and feedback-transport.ts
+ * turns their submissions into drafts. The api key passed to init() is inert
+ * for widget traffic (real submission auth lives in feedback-encoder.ts).
  *
  * One element cannot host both primitives: partial feedback refuses
  * input/textarea, and edit capture only works ON input/textarea — hence the
@@ -25,6 +27,7 @@ export function ensureCoolhandInit(): void {
   if (initialized) return;
   initialized = true;
   coolhand.init(runtimeConfig.value.coolhandApiKey || 'captainslog-intercepted', {
+    apiUrl: WIDGET_CAPTURE_URL,
     autoAttach: false,
     enableFingerprint: false,
     autoHighlight: false,

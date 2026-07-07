@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, beforeAll, vi, type Mock } from 'vitest';
 import { installFeedbackTransport } from './feedback-transport';
 import { encodeAndSubmit, encodeCoolhandRecords, encodePrdPayload } from './feedback-encoder';
-import { COOLHAND_FEEDBACK_URL } from '../config/constants';
+import { COOLHAND_FEEDBACK_URL, WIDGET_CAPTURE_URL } from '../config/constants';
 import { runtimeConfig } from '../config/runtime-config';
 import type { ReviewItem } from '../types/review';
 import type { FeedbackDraft } from '../types/feedback';
@@ -36,7 +36,9 @@ function widgetSend(
   method: 'POST' | 'PATCH' = 'POST',
   id?: number,
 ): Promise<Response> {
-  const url = id !== undefined ? `${COOLHAND_FEEDBACK_URL}/${id}` : COOLHAND_FEEDBACK_URL;
+  // Widgets submit to the capture sentinel — coolhand-adapter injects it via
+  // the SDK's apiUrl init option.
+  const url = id !== undefined ? `${WIDGET_CAPTURE_URL}/${id}` : WIDGET_CAPTURE_URL;
   return window.fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
@@ -54,6 +56,12 @@ describe('feedback transport (capture-to-draft)', () => {
   it('passes unrelated URLs through untouched', async () => {
     await window.fetch('https://example.com/api');
     expect(networkFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes the REAL Coolhand endpoint through — only the sentinel is intercepted', async () => {
+    await window.fetch(COOLHAND_FEEDBACK_URL, { method: 'POST', body: '{}' });
+    expect(networkFetch).toHaveBeenCalledTimes(1);
+    expect((networkFetch.mock.calls[0] as [string])[0]).toBe(COOLHAND_FEEDBACK_URL);
   });
 
   it('synthesizes a widget-compatible response with a stable id for PATCHes', async () => {

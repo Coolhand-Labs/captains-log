@@ -2,7 +2,6 @@ import type { RuntimeConfig } from '../config/runtime-config';
 import type { ReviewItem } from '../types/review';
 import type { CaptainFeedbackPayload, FeedbackDraft, Sentiment } from '../types/feedback';
 import { COLLECTOR, COOLHAND_FEEDBACK_URL } from '../config/constants';
-import { realFetch } from './feedback-transport';
 import { getAuthHeaders } from './auth/auth';
 
 /**
@@ -103,7 +102,9 @@ async function postJson(
   body: unknown,
   headers: Record<string, string>,
 ): Promise<void> {
-  const res = await realFetch(url, {
+  // Plain fetch is safe: the transport wrapper only intercepts the widget
+  // capture sentinel, never real API endpoints.
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...headers },
     body: JSON.stringify(body),

@@ -15,4 +15,9 @@ describe('coolhand default singleton', () => {
     expect(typeof coolhand.detachPartialFeedback).toBe('function');
     expect(typeof coolhand.destroy).toBe('function');
   });
+
+  it('exposes the SDK version (post export-alignment PR)', () => {
+    expect(typeof coolhand.version).toBe('string');
+    expect(coolhand.version).toMatch(/^\d+\.\d+\.\d+/);
+  });
 });

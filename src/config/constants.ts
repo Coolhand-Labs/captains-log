@@ -1,11 +1,17 @@
 /**
- * Mirror of coolhand-js's hardcoded feedback endpoint.
- * Pinned to sdks/coolhand-js/src/constants.ts:4 (COOLHAND_API_URL) — the UMD bundle
- * only exposes its default export, so the constant cannot be imported at runtime.
- * The feedback transport intercepts widget fetches to this URL. If coolhand-js gains
- * an `apiUrl` init option (upstream PR candidate), thread it through instead.
+ * Coolhand's feedback API endpoint (PRD §9.2) — used by feedback-encoder.ts for
+ * real submissions in coolhand/both modes.
  */
 export const COOLHAND_FEEDBACK_URL = 'https://coolhandlabs.com/api/v2/llm_request_log_feedbacks';
+
+/**
+ * Sentinel endpoint injected into coolhand-js via its `apiUrl` init option
+ * (coolhand-js ≥ the apiUrl PR). Widgets submit here; feedback-transport.ts
+ * intercepts exactly this URL and turns submissions into local drafts. The
+ * `.invalid` TLD is reserved (RFC 2606), so nothing can ever resolve it.
+ */
+export const WIDGET_CAPTURE_URL =
+  'https://feedback-capture.captainslog.invalid/llm_request_log_feedbacks';
 
 /** Coolhand-hosted review queue (PRD §9.1 — endpoint is net-new, see docs/coolhand-issues/01). */
 export const COOLHAND_REVIEW_QUEUE_URL = 'https://coolhandlabs.com/captain/review-queue';

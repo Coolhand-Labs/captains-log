@@ -23,8 +23,8 @@ Any new, generally-useful component that is **not captainslog-specific** is a ca
 Current candidates:
 - **Serialized single-output review card** (`src/components/OutputPanel.tsx` + `SessionHeader.tsx`) — the one-at-a-time review surface.
 - **Time-boxed progress tracker** (`src/state/timer.ts` + the header timer UI).
-- **`apiUrl` init option for coolhand-js** — the SDK hardcodes its endpoint (`src/constants.ts`); captainslog mirrors that string to intercept widget traffic (`src/services/feedback-transport.ts`). A configurable `apiUrl` upstream removes that fragility.
-- **UMD export mismatch fix** — coolhand-js builds with webpack `export: 'default'`, so the named exports declared in its `index.d.ts` are `undefined` at runtime. Either export the namespace or trim the declared surface.
+
+Already upstreamed (merged): the `apiUrl` init option (coolhand-js #36 — captainslog now injects its capture sentinel through it) and the UMD named-exports/d.ts alignment (coolhand-js #37).
 
 ## Architectural invariants
 

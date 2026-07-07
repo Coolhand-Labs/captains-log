@@ -1,14 +1,15 @@
-import { COOLHAND_FEEDBACK_URL } from '../config/constants';
+import { WIDGET_CAPTURE_URL } from '../config/constants';
 
 /**
  * Capture-to-draft transport (the architectural keystone).
  *
- * coolhand-js widgets submit feedback by fetch()ing their hardcoded endpoint
- * (sdks/coolhand-js/src/constants.ts:4) the moment the user interacts — but the
- * PRD requires atomic "Submit & Next" (retry without advancing) and "Skip" that
- * sends nothing. So widget traffic is intercepted here, decoded into the current
- * item's FeedbackDraft, and NEVER forwarded; captainslog owns all real submission
- * (services/feedback-encoder.ts). This also makes demo mode zero-network for free.
+ * coolhand-js widgets are pointed at WIDGET_CAPTURE_URL via the SDK's `apiUrl`
+ * init option (see coolhand-adapter.ts) — a reserved-.invalid sentinel that only
+ * this wrapper answers. Widget submissions are decoded into the current item's
+ * FeedbackDraft and NEVER forwarded; the PRD requires atomic "Submit & Next"
+ * (retry without advancing) and "Skip" that sends nothing, so captainslog owns
+ * all real submission (services/feedback-encoder.ts). This also makes demo mode
+ * zero-network for free.
  *
  * A synthesized success response keeps the widgets' create-then-PATCH lifecycle
  * intact: they store the returned id in data-coolhand-feedback-id and PATCH it on
@@ -42,15 +43,6 @@ type CaptureHandler = (captured: CapturedFeedback) => void;
 let handler: CaptureHandler | null = null;
 let nextId = 1;
 let installed = false;
-let passthroughFetch: typeof window.fetch = (...args) => window.fetch(...args);
-
-/**
- * The un-wrapped fetch. feedback-encoder.ts submits REAL feedback to the same
- * Coolhand URL the widgets target — it must bypass this interception layer.
- */
-export function realFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-  return passthroughFetch(input, init);
-}
 
 /** The session store registers here; unhandled captures are dropped (safe in demo). */
 export function setFeedbackCaptureHandler(h: CaptureHandler | null): void {
@@ -74,14 +66,14 @@ export function installFeedbackTransport(): void {
   installed = true;
 
   const originalFetch = window.fetch.bind(window);
-  passthroughFetch = originalFetch;
 
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url =
       typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
-    // Scoped: only coolhand-js widget feedback traffic; everything else passes through.
-    if (!url.startsWith(COOLHAND_FEEDBACK_URL)) {
+    // Scoped: only widget traffic to the capture sentinel; everything else —
+    // including the encoder's real Coolhand submissions — passes through.
+    if (!url.startsWith(WIDGET_CAPTURE_URL)) {
       return originalFetch(input, init);
     }
 
@@ -91,7 +83,7 @@ export function installFeedbackTransport(): void {
     const payload = await readBody(input, init);
 
     const isUpdate = method === 'PATCH';
-    const idFromUrl = Number(url.slice(COOLHAND_FEEDBACK_URL.length).replace(/^\//, ''));
+    const idFromUrl = Number(url.slice(WIDGET_CAPTURE_URL.length).replace(/^\//, ''));
     const feedbackId = isUpdate && Number.isFinite(idFromUrl) ? idFromUrl : nextId++;
 
     handler?.({ kind: isUpdate ? 'update' : 'create', feedbackId, payload });
