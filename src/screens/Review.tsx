@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import type { Theme } from '../theme/theme';
 import type { ReviewItem } from '../types/review';
 import type { Sentiment } from '../types/feedback';
@@ -39,6 +39,12 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
   const item = currentItem.value;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reference, setReference] = useState<ReferenceKind | null>(null);
+
+  // Reference selection is per item — don't carry an open prompt to the next one.
+  useEffect(() => {
+    setReference(null);
+  }, [item?.id]);
 
   useEffect(() => {
     if (!item) {
@@ -71,7 +77,12 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
   };
 
   return (
-    <main class="mx-auto w-full max-w-2xl flex-1 px-5 pb-12 pt-6">
+    // The container widens when the reference panel is docked side-by-side.
+    <main
+      class={`mx-auto w-full flex-1 px-5 pb-12 pt-6 transition-[max-width] ${
+        reference !== null ? 'max-w-6xl' : 'max-w-2xl'
+      }`}
+    >
       <SessionHeader
         theme={theme}
         workloadName={item.workload_name}
@@ -89,11 +100,16 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
         </div>
       )}
 
-      <div class={isPaused.value ? 'pointer-events-none select-none blur-[2px]' : ''}>
+      <div
+        class={`${isPaused.value ? 'pointer-events-none select-none blur-[2px]' : ''} ${
+          reference !== null ? 'lg:flex lg:items-start lg:gap-6' : ''
+        }`}
+      >
+        <div class="min-w-0 flex-1">
         {/* Remount per item so widget attachments and fades reset cleanly. */}
         <OutputPanel key={item.id} item={item} />
 
-        <ReferenceBlocks item={item} />
+        <ReferenceButtons item={item} reference={reference} onToggle={setReference} />
 
         <section class="my-4" aria-label="Your feedback">
           <div role="radiogroup" aria-label="Overall sentiment" class="mb-3 flex gap-2">
@@ -150,6 +166,16 @@ export function Review({ theme }: { theme: Theme }): JSX.Element | null {
             Skip
           </button>
         </div>
+        </div>
+
+        {reference !== null && (
+          <ReferencePanel
+            item={item}
+            kind={reference}
+            onSwitch={setReference}
+            onClose={() => setReference(null)}
+          />
+        )}
       </div>
     </main>
   );
@@ -159,112 +185,105 @@ type ReferenceKind = 'prompt' | 'input';
 
 /**
  * Prompt / input-data reference (PRD §7.3): hidden by default, each one click
- * away, opened in a side drawer so the output under review stays on screen.
+ * away. Opens a NON-modal panel docked beside the output (below it on narrow
+ * screens) — the captain can read the prompt while annotating or editing.
  */
-function ReferenceBlocks({ item }: { item: ReviewItem }): JSX.Element {
-  const [reference, setReference] = useState<ReferenceKind | null>(null);
+function ReferenceButtons({
+  item,
+  reference,
+  onToggle,
+}: {
+  item: ReviewItem;
+  reference: ReferenceKind | null;
+  onToggle: (kind: ReferenceKind | null) => void;
+}): JSX.Element {
+  const button = (kind: ReferenceKind, label: string) => (
+    <button
+      class="btn"
+      data-variant={reference === kind ? undefined : 'outline'}
+      data-size="sm"
+      aria-expanded={reference === kind}
+      // Only reference the panel while it exists in the DOM (axe: aria-valid-attr-value).
+      aria-controls={reference !== null ? 'cl-reference-panel' : undefined}
+      onClick={() => onToggle(reference === kind ? null : kind)}
+    >
+      {label}
+    </button>
+  );
   return (
     <section class="my-3 flex gap-2" aria-label="Reference: what was this supposed to do?">
-      {item.prompt !== undefined && (
-        <button
-          class="btn text-science"
-          data-variant="outline"
-          data-size="sm"
-          onClick={() => setReference('prompt')}
-        >
-          View Prompt
-        </button>
-      )}
-      {item.input_data !== undefined && (
-        <button
-          class="btn text-science"
-          data-variant="outline"
-          data-size="sm"
-          onClick={() => setReference('input')}
-        >
-          View Input Data
-        </button>
-      )}
-      {reference !== null && (
-        <ReferenceDrawer item={item} initial={reference} onClose={() => setReference(null)} />
-      )}
+      {item.prompt !== undefined && button('prompt', 'View Prompt')}
+      {item.input_data !== undefined && button('input', 'View Input Data')}
     </section>
   );
 }
 
-function ReferenceDrawer({
+function ReferencePanel({
   item,
-  initial,
+  kind,
+  onSwitch,
   onClose,
 }: {
   item: ReviewItem;
-  initial: ReferenceKind;
+  kind: ReferenceKind;
+  onSwitch: (kind: ReferenceKind) => void;
   onClose: () => void;
 }): JSX.Element {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const [kind, setKind] = useState<ReferenceKind>(initial);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    dialog.showModal();
-    dialog.addEventListener('close', onClose);
-    return () => dialog.removeEventListener('close', onClose);
-  }, [onClose]);
-
   const hasBoth = item.prompt !== undefined && item.input_data !== undefined;
   const content =
     kind === 'prompt' ? (item.prompt ?? '') : JSON.stringify(item.input_data, null, 2);
 
   return (
-    <dialog
-      ref={dialogRef}
-      class="drawer"
-      data-side="right"
+    <aside
+      id="cl-reference-panel"
+      class="card mt-4 w-full lg:sticky lg:top-4 lg:mt-0 lg:max-h-[calc(100vh-2rem)] lg:w-96 lg:shrink-0 lg:overflow-y-auto"
       aria-labelledby="cl-ref-title"
-      onClick={(e) => e.target === e.currentTarget && e.currentTarget.close()}
     >
-      <article>
-        <header>
-          <h2 id="cl-ref-title">Reference</h2>
-          <p>What was this output supposed to do? Reference only — not what you’re judging.</p>
-        </header>
-        <section class="overflow-y-auto px-4">
-          {hasBoth && (
-            <div role="group" aria-label="Reference content" class="button-group mb-3">
-              <button
-                class="btn"
-                data-size="sm"
-                data-variant={kind === 'prompt' ? undefined : 'outline'}
-                aria-pressed={kind === 'prompt'}
-                onClick={() => setKind('prompt')}
-              >
-                Prompt
-              </button>
-              <button
-                class="btn"
-                data-size="sm"
-                data-variant={kind === 'input' ? undefined : 'outline'}
-                aria-pressed={kind === 'input'}
-                onClick={() => setKind('input')}
-              >
-                Input Data
-              </button>
-            </div>
-          )}
-          <pre
-            class="whitespace-pre-wrap rounded-md border border-border bg-muted p-4 font-mono text-[0.82rem]"
-            tabindex={0}
+      <header>
+        <h2 id="cl-ref-title">Reference</h2>
+        <p>What was this output supposed to do? Reference only — not what you’re judging.</p>
+        <div class="card-action">
+          <button
+            class="btn"
+            data-variant="ghost"
+            data-size="sm"
+            aria-label="Close reference"
+            onClick={onClose}
           >
-            {content}
-          </pre>
-        </section>
-        <footer>
-          <button class="btn" data-variant="outline" onClick={() => dialogRef.current?.close()}>
-            Close
+            ✕
           </button>
-        </footer>
-      </article>
-    </dialog>
+        </div>
+      </header>
+      <section>
+        {hasBoth && (
+          <div role="group" aria-label="Reference content" class="button-group mb-3">
+            <button
+              class="btn"
+              data-size="sm"
+              data-variant={kind === 'prompt' ? undefined : 'outline'}
+              aria-pressed={kind === 'prompt'}
+              onClick={() => onSwitch('prompt')}
+            >
+              Prompt
+            </button>
+            <button
+              class="btn"
+              data-size="sm"
+              data-variant={kind === 'input' ? undefined : 'outline'}
+              aria-pressed={kind === 'input'}
+              onClick={() => onSwitch('input')}
+            >
+              Input Data
+            </button>
+          </div>
+        )}
+        <pre
+          class="whitespace-pre-wrap rounded-md border border-border bg-muted p-4 font-mono text-[0.82rem]"
+          tabindex={0}
+        >
+          {content}
+        </pre>
+      </section>
+    </aside>
   );
 }

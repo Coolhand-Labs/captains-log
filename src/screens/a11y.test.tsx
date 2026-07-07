@@ -82,7 +82,7 @@ describe('a11y: keyboard interaction', () => {
     stopTimer();
   });
 
-  it('reference drawer shows prompt and input data independently', async () => {
+  it('reference panel docks beside the output, prompt and input independently', async () => {
     startDemo();
     queue.value = [item];
     currentIndex.value = 0;
@@ -93,22 +93,29 @@ describe('a11y: keyboard interaction', () => {
     expect(queryByText('Summarize the away mission.')).toBeNull();
     expect(queryByText(/mission_id/)).toBeNull();
 
-    // Open the prompt in the side drawer — output stays rendered.
+    // Open the prompt — NON-modal side panel; the output stays rendered and interactive.
     fireEvent.click(getByRole('button', { name: 'View Prompt' }));
     expect(queryByText('Summarize the away mission.')).not.toBeNull();
     expect(queryByText(/mission_id/)).toBeNull();
     expect(queryByText(/All crew returned safely/)).not.toBeNull();
+    // No dialog/backdrop involved — the panel is a plain complementary region.
+    expect(container.querySelector('dialog')).toBeNull();
+    expect(getByRole('complementary', { name: 'Reference' })).toBeTruthy();
 
-    // Switch to input data inside the drawer.
+    // Switch to input data inside the panel.
     fireEvent.click(getByRole('button', { name: 'Input Data' }));
     expect(queryByText(/mission_id/)).not.toBeNull();
     expect(queryByText('Summarize the away mission.')).toBeNull();
 
-    // Drawer open state passes axe.
+    // Panel-open state passes axe.
     expect(await axe(container)).toHaveNoViolations();
 
-    // Close restores the hidden-by-default state.
-    fireEvent.click(getByRole('button', { name: 'Close' }));
+    // Close restores the hidden-by-default state; toggling the button does too.
+    fireEvent.click(getByRole('button', { name: 'Close reference' }));
+    expect(queryByText(/mission_id/)).toBeNull();
+    fireEvent.click(getByRole('button', { name: 'View Input Data' }));
+    expect(queryByText(/mission_id/)).not.toBeNull();
+    fireEvent.click(getByRole('button', { name: 'View Input Data' }));
     expect(queryByText(/mission_id/)).toBeNull();
     stopTimer();
   });
