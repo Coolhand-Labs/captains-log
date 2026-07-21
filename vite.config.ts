@@ -17,16 +17,9 @@ export default defineConfig({
   // Relative base so the static build deploys from any path (S3, GH Pages, file://).
   base: './',
   optimizeDeps: {
-    // coolhand is a symlinked file: dependency shipping a UMD/CJS bundle;
-    // without this Vite treats it as source and skips CJS interop.
+    // coolhand ships a UMD/CJS bundle; without this Vite treats it as
+    // source and skips CJS interop.
     include: ['coolhand'],
-  },
-  build: {
-    commonjsOptions: {
-      // The symlinked coolhand dep resolves OUTSIDE node_modules, so the
-      // default include pattern would skip its UMD→ESM interop.
-      include: [/node_modules/, /coolhand-js/],
-    },
   },
   test: {
     environment: 'jsdom',

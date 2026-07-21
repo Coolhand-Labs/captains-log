@@ -1,13 +1,7 @@
 "$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
 
 [scripts]
-setup = """
-COOLHAND_PATH=$(node -p "require('./package.json').dependencies.coolhand.replace(/^file:/, '')")
-if [ ! -f "$COOLHAND_PATH/dist/coolhand.js" ]; then
-  (cd "$COOLHAND_PATH" && npm ci && npm run build)
-fi
-npm install
-"""
+setup = "npm ci"
 archive = "rm -rf node_modules"
 run_mode = "concurrent"
 
