@@ -1,0 +1,21 @@
+"$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
+
+[scripts]
+setup = """
+COOLHAND_PATH=$(node -p "require('./package.json').dependencies.coolhand.replace(/^file:/, '')")
+if [ ! -f "$COOLHAND_PATH/dist/coolhand.js" ]; then
+  (cd "$COOLHAND_PATH" && npm ci && npm run build)
+fi
+npm install
+"""
+archive = "rm -rf node_modules"
+run_mode = "concurrent"
+
+[scripts.run.dev]
+command = "npm run dev -- --port $CONDUCTOR_PORT"
+default = true
+icon = "play"
+
+[scripts.run.test]
+command = "npm run test:watch"
+icon = "test-tube"
