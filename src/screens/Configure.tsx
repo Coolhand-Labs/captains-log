@@ -6,7 +6,7 @@ import { provider, workloads, startSession } from '../state/session';
 import {
   presetBalanced,
   presetEverything,
-  presetExperimental,
+  presetDevelopment,
   projectSelection,
   type SamplingRates,
 } from '../services/sampling';
@@ -233,9 +233,9 @@ export function Configure({ theme }: { theme: Theme }): JSX.Element {
                   >
                     <span class="flex items-center gap-2">
                       {w.name}
-                      {w.experimental && (
+                      {w.maturity && (
                         <span class="badge" data-variant="secondary">
-                          experimental
+                          {w.maturity}
                         </span>
                       )}
                     </span>
@@ -275,9 +275,9 @@ export function Configure({ theme }: { theme: Theme }): JSX.Element {
                   class="btn"
                   data-variant="outline"
                   data-size="sm"
-                  onClick={() => setRates(presetExperimental(workloads.value, targetMinutes))}
+                  onClick={() => setRates(presetDevelopment(workloads.value, targetMinutes))}
                 >
-                  Priority to Experimental
+                  Priority to Development
                 </button>
               </div>
               {workloads.value.map((w) => (
@@ -286,7 +286,7 @@ export function Configure({ theme }: { theme: Theme }): JSX.Element {
                   id={w.id}
                   label={w.name}
                   pendingCount={w.pending_count}
-                  experimental={w.experimental}
+                  maturity={w.maturity}
                   rate={rates[w.id] ?? 1}
                   onChange={(rate) => setRates((prev) => ({ ...prev, [w.id]: rate }))}
                 />
