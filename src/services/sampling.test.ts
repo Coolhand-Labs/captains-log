@@ -5,15 +5,15 @@ import {
   shuffle,
   projectSelection,
   presetBalanced,
-  presetExperimental,
+  presetDevelopment,
   presetEverything,
   samplePlan,
 } from './sampling';
 
 const workloads: WorkloadSummary[] = [
-  { id: 'big', name: 'Big Mature', pending_count: 100 },
-  { id: 'small', name: 'Small Mature', pending_count: 10 },
-  { id: 'exp', name: 'New Experiment', pending_count: 8, experimental: true },
+  { id: 'big', name: 'Big Stable', pending_count: 100, maturity: 'stable' },
+  { id: 'small', name: 'Small Unclassified', pending_count: 10 },
+  { id: 'exp', name: 'New Experiment', pending_count: 8, maturity: 'development' },
 ];
 
 function makeItems(workloadId: string, count: number): ReviewItem[] {
@@ -53,16 +53,16 @@ describe('presets', () => {
     expect(rates.exp).toBe(1);
   });
 
-  it('presetExperimental reviews all experimental items, fills remainder from mature', () => {
-    const rates = presetExperimental(workloads, 60, 1.5);
+  it('presetDevelopment reviews all development items, fills remainder from the rest', () => {
+    const rates = presetDevelopment(workloads, 60, 1.5);
     expect(rates.exp).toBe(1);
-    // 40 target - 8 experimental = 32 across 110 mature items.
+    // 40 target - 8 development = 32 across 110 other items (stable and unclassified alike).
     expect(rates.big).toBeCloseTo(32 / 110, 5);
     expect(rates.small).toBeCloseTo(32 / 110, 5);
   });
 
-  it('presetExperimental gives mature workloads nothing when experiments fill the box', () => {
-    const rates = presetExperimental(workloads, 10, 1.5); // ~6.7 items < 8 experimental
+  it('presetDevelopment gives other workloads nothing when development work fills the box', () => {
+    const rates = presetDevelopment(workloads, 10, 1.5); // ~6.7 items < 8 in development
     expect(rates.exp).toBe(1);
     expect(rates.big).toBe(0);
   });
