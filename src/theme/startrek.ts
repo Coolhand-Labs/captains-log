@@ -6,7 +6,7 @@ export const startrekTheme: Theme = {
   landingTagline:
     'Move from babysitting AI turn-by-turn to reviewing final outputs — one at a time, time-boxed, with feedback that actually improves the process.',
   landingDemoCta: 'Try Demo',
-  landingConnectCta: 'Connect Your Data',
+  landingCustomBackendCta: 'Custom backend (API key)',
   rewardHeadlines: [
     'Captain, the logs have been reviewed.',
     'Stardate secured. Outstanding work, Captain.',

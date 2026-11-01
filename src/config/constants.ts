@@ -16,10 +16,6 @@ export const WIDGET_CAPTURE_URL =
 /** Coolhand-hosted review queue (PRD §9.1 — endpoint is net-new, see docs/coolhand-issues/01). */
 export const COOLHAND_REVIEW_QUEUE_URL = 'https://coolhandlabs.com/captain/review-queue';
 
-/** Coolhand OAuth endpoints (PRD §9.3 — net-new, see docs/coolhand-issues/04). */
-export const COOLHAND_OAUTH_AUTHORIZE_URL = 'https://coolhandlabs.com/oauth/authorize';
-export const COOLHAND_OAUTH_TOKEN_URL = 'https://coolhandlabs.com/oauth/token';
-
 declare const __CAPTAINSLOG_VERSION__: string;
 export const VERSION =
   typeof __CAPTAINSLOG_VERSION__ !== 'undefined' ? __CAPTAINSLOG_VERSION__ : '0.0.0';

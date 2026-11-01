@@ -3,9 +3,13 @@ import { signal } from '@preact/signals';
 import type { Theme } from '../theme/theme';
 import { navigate } from '../router';
 import { startDemo } from '../state/session';
-import { AuthModal } from './AuthModal';
+import { entryPoints } from '../config/entry-points';
+import { authState, signOut } from '../services/auth/auth';
+import { beginOAuthLogin } from '../services/auth/oauth';
+import { CustomBackendModal } from './CustomBackendModal';
 
-const authModalOpen = signal(false);
+const customBackendOpen = signal(false);
+const remember = signal(false);
 
 export function Landing({ theme }: { theme: Theme }): JSX.Element {
   return (
@@ -17,32 +21,77 @@ export function Landing({ theme }: { theme: Theme }): JSX.Element {
       <p class="mx-auto mb-8 max-w-xl text-muted-foreground">{theme.landingTagline}</p>
 
       <div class="mb-6 flex flex-wrap justify-center gap-4">
-        <button
-          class="btn"
-          data-size="lg"
-          onClick={() => {
-            startDemo();
-            navigate('configure');
-          }}
-        >
-          {theme.landingDemoCta}
-        </button>
-        <button
-          class="btn"
-          data-variant="outline"
-          data-size="lg"
-          onClick={() => (authModalOpen.value = true)}
-        >
-          {theme.landingConnectCta}
-        </button>
+        {entryPoints.value.map((entry, i) =>
+          entry.type === 'demo' ? (
+            <button
+              key={`demo-${i}`}
+              class="btn"
+              data-size="lg"
+              onClick={() => {
+                startDemo();
+                navigate('configure');
+              }}
+            >
+              {entry.label ?? theme.landingDemoCta}
+            </button>
+          ) : (
+            <button
+              key={entry.id}
+              class="btn"
+              data-variant="outline"
+              data-size="lg"
+              onClick={() => void beginOAuthLogin(entry, remember.value)}
+            >
+              {entry.label}
+            </button>
+          ),
+        )}
       </div>
 
       <p class="text-sm text-muted-foreground">
         The demo runs entirely in your browser with starship dummy data — no account, no network
-        calls. Connect your data to review real workloads via Coolhand or your own backend.
+        calls. Connect your data to review real workloads via one of the sign-in options above,
+        or your own backend.
       </p>
 
-      {authModalOpen.value && <AuthModal theme={theme} onClose={() => (authModalOpen.value = false)} />}
+      <label class="label mx-auto mt-4 w-fit gap-2 text-sm">
+        <input
+          class="input"
+          type="checkbox"
+          checked={remember.value}
+          onChange={(e) => (remember.value = e.currentTarget.checked)}
+        />
+        Remember me on this device
+      </label>
+
+      <button
+        class="btn mt-2"
+        data-variant="link"
+        data-size="sm"
+        onClick={() => (customBackendOpen.value = true)}
+      >
+        {theme.landingCustomBackendCta}
+      </button>
+
+      {authState.value.kind !== 'demo' && (
+        <p class="mt-2 text-sm text-muted-foreground">
+          Signed in (
+          {authState.value.kind === 'oauth'
+            ? authState.value.label
+            : 'custom backend'}
+          ).{' '}
+          <button class="btn" data-variant="link" data-size="sm" onClick={() => signOut()}>
+            Sign out
+          </button>
+        </p>
+      )}
+
+      {customBackendOpen.value && (
+        <CustomBackendModal
+          remember={remember.value}
+          onClose={() => (customBackendOpen.value = false)}
+        />
+      )}
     </main>
   );
 }

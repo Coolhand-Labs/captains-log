@@ -10,7 +10,7 @@ export interface Theme {
   shipHeader: string;
   landingTagline: string;
   landingDemoCta: string;
-  landingConnectCta: string;
+  landingCustomBackendCta: string;
   /** Headline pool for the reward screen; one is picked per session. */
   rewardHeadlines: string[];
   /** Rotating quips / Easter eggs for the reward screen. */

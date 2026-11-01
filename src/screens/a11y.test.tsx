@@ -38,9 +38,9 @@ describe('a11y: screens have no axe violations', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('a11y Landing auth modal', async () => {
+  it('a11y Landing custom-backend modal', async () => {
     const { container, getByText } = render(<Landing theme={startrekTheme} />);
-    fireEvent.click(getByText(startrekTheme.landingConnectCta));
+    fireEvent.click(getByText(startrekTheme.landingCustomBackendCta));
     expect(await axe(container)).toHaveNoViolations();
   });
 
