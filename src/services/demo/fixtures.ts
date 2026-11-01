@@ -1,3 +1,5 @@
+import type { WorkloadMaturity } from '../../types/review';
+
 /**
  * Star Trek demo data (PRD §5). Flavor only — swappable with the theme.
  * Raw fixtures DELIBERATELY include forbidden metadata (model, provider,
@@ -23,7 +25,7 @@ export interface RawDemoItem extends Record<string, unknown> {
 interface WorkloadSpec {
   id: string;
   name: string;
-  experimental: boolean;
+  maturity: WorkloadMaturity;
   prompt: string;
   outputs: string[];
   inputData: (i: number) => unknown;
@@ -33,7 +35,7 @@ const WORKLOADS: WorkloadSpec[] = [
   {
     id: 'engineering-report-generation',
     name: 'Engineering Report Generation',
-    experimental: false,
+    maturity: 'stable',
     prompt:
       'Draft a concise engineering maintenance report from the following warp core telemetry. Use headings for Summary, Findings, and Recommendations.',
     inputData: (i) => ({
@@ -54,7 +56,7 @@ const WORKLOADS: WorkloadSpec[] = [
   {
     id: 'captains-daily-brief',
     name: "Captain's Daily Brief",
-    experimental: false,
+    maturity: 'stable',
     prompt:
       "Compose the captain's daily briefing from department reports. Keep it under 200 words, lead with anything requiring the captain's decision.",
     inputData: (i) => ({
@@ -71,7 +73,7 @@ const WORKLOADS: WorkloadSpec[] = [
   {
     id: 'away-team-report',
     name: 'Away Team Report',
-    experimental: false,
+    maturity: 'maturing',
     prompt:
       'Summarize the away mission from the team logs: objective, events, personnel status, and follow-ups. Neutral tone, past tense.',
     inputData: (i) => ({
@@ -87,7 +89,7 @@ const WORKLOADS: WorkloadSpec[] = [
   {
     id: 'crew-schedule-optimization',
     name: 'Crew Schedule Optimization',
-    experimental: true,
+    maturity: 'development',
     prompt:
       'Given staffing constraints and crew preferences, propose next week’s shift schedule. Explain trade-offs briefly and flag any regulation conflicts.',
     inputData: (i) => ({
@@ -109,13 +111,13 @@ const ITEMS_PER_WORKLOAD = 12;
 export interface DemoWorkloadMeta {
   id: string;
   name: string;
-  experimental: boolean;
+  maturity: WorkloadMaturity;
 }
 
-export const demoWorkloads: DemoWorkloadMeta[] = WORKLOADS.map(({ id, name, experimental }) => ({
+export const demoWorkloads: DemoWorkloadMeta[] = WORKLOADS.map(({ id, name, maturity }) => ({
   id,
   name,
-  experimental,
+  maturity,
 }));
 
 /** Items spread across the trailing 7 days so every time-window option has data. */

@@ -1,10 +1,11 @@
 import type { JSX } from 'preact';
+import type { WorkloadMaturity } from '../types/review';
 
 interface Props {
   id: string;
   label: string;
   pendingCount: number;
-  experimental?: boolean;
+  maturity?: WorkloadMaturity | null;
   /** 0–1 */
   rate: number;
   onChange: (rate: number) => void;
@@ -14,7 +15,7 @@ export function RateSlider({
   id,
   label,
   pendingCount,
-  experimental,
+  maturity,
   rate,
   onChange,
 }: Props): JSX.Element {
@@ -25,9 +26,9 @@ export function RateSlider({
       <label for={sliderId} class="label flex-col items-start gap-0.5">
         <span class="flex items-center gap-2">
           {label}
-          {experimental && (
+          {maturity && (
             <span class="badge" data-variant="secondary">
-              experimental
+              {maturity}
             </span>
           )}
         </span>

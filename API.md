@@ -60,11 +60,11 @@ GET /captain/review-queue/workloads?time_window_start=...&time_window_end=...
 
 ```json
 [
-  { "id": "engineering-report-generation", "name": "Engineering Report Generation", "pending_count": 42, "experimental": false }
+  { "id": "engineering-report-generation", "name": "Engineering Report Generation", "pending_count": 42, "maturity": "stable" }
 ]
 ```
 
-`experimental` drives the "Priority to Experimental" sampling preset. **Optional:** if this endpoint is absent, captainslog falls back to deriving workload names/counts from the first pages of the review queue (bounded, best-effort).
+`maturity` is Coolhand's workload maturity label (`development`, `maturing`, `stable`, `dormant`, or `null` until first classified). It is shown as a badge, and `development` drives the "Priority to Development" sampling preset. **Optional:** if this endpoint is absent, captainslog falls back to deriving workload names/counts from the first pages of the review queue (bounded, best-effort).
 
 ## 2. Feedback write
 

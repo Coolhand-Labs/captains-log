@@ -15,7 +15,7 @@ Open the printed URL and hit **Try Demo**. The demo is a starship captain review
 
 ## The flow
 
-1. **Configure** — pick a review window (last 4h/24h/7d/custom), a time box (20 min / 1 h / 2 h), and sampling: Quick Start (uniform random, capped to your time box) or per-workload rates with presets (*Balance Across All*, *Priority to Experimental*) and a live projection.
+1. **Configure** — pick a review window (last 4h/24h/7d/custom), a time box (20 min / 1 h / 2 h), and sampling: Quick Start (uniform random, capped to your time box) or per-workload rates with presets (*Balance Across All*, *Priority to Development*) and a live projection.
 2. **Review** — one item at a time. The AI output (Markdown) is front and center; the prompt and input data are one click away (each independently). **Annotate** mode: select any passage to attach a comment + sentiment to that span. **Edit** mode: revise the output directly. Overall sentiment (👍 😐 👎) and an optional explanation round out the package. **Submit & Next** sends everything atomically; **Skip** sends nothing. Model, provider, and token metadata are never shown — by design, so reviews stay unbiased.
 3. **Reward** — hit your time target (or empty the queue) and get a starfield, session stats (sentiment breakdown, edits, annotations), and the offer to keep going if fresh items arrived mid-session.
 

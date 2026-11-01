@@ -29,7 +29,7 @@ export function createDemoProvider(): ReviewQueueProvider & {
         demoWorkloads.map((w) => ({
           id: w.id,
           name: w.name,
-          experimental: w.experimental,
+          maturity: w.maturity,
           pending_count: items.filter(
             (item) =>
               item.workload_id === w.id &&

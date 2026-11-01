@@ -33,12 +33,17 @@ export interface ReviewQueueQuery {
   offset?: number;
 }
 
+export type WorkloadMaturity = 'development' | 'maturing' | 'stable' | 'dormant';
+
 export interface WorkloadSummary {
   id: string;
   name: string;
   pending_count: number;
-  /** Drives the "Priority to Experimental" sampling preset. */
-  experimental?: boolean;
+  /**
+   * Coolhand's workload maturity label; null until the workload is first classified.
+   * `development` drives the "Priority to Development" sampling preset.
+   */
+  maturity?: WorkloadMaturity | null;
 }
 
 /**

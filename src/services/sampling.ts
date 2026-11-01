@@ -70,24 +70,25 @@ export function presetBalanced(
 }
 
 /**
- * "Priority to Experimental": review 100% of experimental workloads, then fill
- * whatever time remains with a uniform slice of the mature ones.
+ * "Priority to Development": review 100% of workloads in development, then fill
+ * whatever time remains with a uniform slice of the rest.
  */
-export function presetExperimental(
+export function presetDevelopment(
   workloads: readonly WorkloadSummary[],
   targetMinutes: number,
   estMinPerItem = EST_MIN_PER_ITEM,
 ): SamplingRates {
   const targetItems = targetMinutes / estMinPerItem;
-  const experimentalItems = workloads
-    .filter((w) => w.experimental)
+  const inDevelopment = (w: WorkloadSummary): boolean => w.maturity === 'development';
+  const developmentItems = workloads
+    .filter(inDevelopment)
     .reduce((sum, w) => sum + w.pending_count, 0);
-  const matureCount = workloads
-    .filter((w) => !w.experimental)
+  const otherCount = workloads
+    .filter((w) => !inDevelopment(w))
     .reduce((sum, w) => sum + w.pending_count, 0);
-  const remaining = Math.max(0, targetItems - experimentalItems);
-  const matureRate = matureCount === 0 ? 0 : Math.min(1, remaining / matureCount);
-  return Object.fromEntries(workloads.map((w) => [w.id, w.experimental ? 1 : matureRate]));
+  const remaining = Math.max(0, targetItems - developmentItems);
+  const otherRate = otherCount === 0 ? 0 : Math.min(1, remaining / otherCount);
+  return Object.fromEntries(workloads.map((w) => [w.id, inDevelopment(w) ? 1 : otherRate]));
 }
 
 /**
