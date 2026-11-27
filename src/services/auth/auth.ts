@@ -2,13 +2,17 @@ import { signal } from '@preact/signals';
 import { runtimeConfig } from '../../config/runtime-config';
 
 /**
- * Auth state (PRD §6.1): demo/none, Coolhand OAuth bearer tokens, or custom
- * backend credentials. Persisted per the captain's "remember me" choice.
+ * Auth state (PRD §6.1): demo/none, an OAuth bearer session against one of the
+ * configured entry points (see config/entry-points.ts), or custom backend
+ * credentials. Persisted per the captain's "remember me" choice.
  */
 export type AuthState =
   | { kind: 'demo' }
   | {
-      kind: 'coolhand_oauth';
+      kind: 'oauth';
+      /** Which entry-points.ts entry this session authenticated against. */
+      providerId: string;
+      label: string;
       accessToken: string;
       refreshToken?: string;
       /** Epoch ms when the access token expires. */
@@ -54,7 +58,7 @@ export function signOut(): void {
 export function getAuthHeaders(target: 'coolhand' | 'self_hosted'): Record<string, string> {
   const state = authState.value;
   if (target === 'coolhand') {
-    if (state.kind === 'coolhand_oauth') return { Authorization: `Bearer ${state.accessToken}` };
+    if (state.kind === 'oauth') return { Authorization: `Bearer ${state.accessToken}` };
     const apiKey = runtimeConfig.value.coolhandApiKey;
     return apiKey ? { 'X-API-Key': apiKey } : {};
   }
@@ -63,6 +67,6 @@ export function getAuthHeaders(target: 'coolhand' | 'self_hosted'): Record<strin
       ? { Authorization: `Bearer ${state.credential}` }
       : { 'X-API-Key': state.credential };
   }
-  if (state.kind === 'coolhand_oauth') return { Authorization: `Bearer ${state.accessToken}` };
+  if (state.kind === 'oauth') return { Authorization: `Bearer ${state.accessToken}` };
   return {};
 }

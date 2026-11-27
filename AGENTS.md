@@ -31,5 +31,6 @@ Tests are **Vitest** (jsdom + @testing-library/preact + vitest-axe) — a delibe
 
 - `src/services/` — transport, encoder, coolhand adapter, sampling, sanitize, api-client, auth/, demo/
 - `src/state/` — session (queue/drafts/submissions), timer, stats signals
-- `src/screens/` — Landing, AuthModal, Configure, Review, Reward
+- `src/screens/` — Landing, CustomBackendModal, Configure, Review, Reward
+- `src/config/` — runtime-config (mode/URLs), entry-points (Landing sign-in buttons), constants
 - `src/theme/` — ALL Star Trek flavor copy (swap point)

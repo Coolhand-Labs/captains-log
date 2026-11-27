@@ -1,0 +1,28 @@
+{
+  "_comment": "Copy to entry-points.json next to index.html to control which Landing buttons appear. Omit the file entirely to use the code-shipped defaults (Try Demo + Sign in with Coolhand, both present but the OAuth entry needs a clientId to actually work). See CONFIGURATION.md.",
+  "entryPoints": [
+    { "type": "demo", "label": "Try Demo" },
+    {
+      "type": "oauth",
+      "id": "coolhand",
+      "label": "Sign in with Coolhand",
+      "authorizeUrl": "https://coolhandlabs.com/oauth/authorize",
+      "tokenUrl": "https://coolhandlabs.com/oauth/token",
+      "clientId": "your-registered-coolhand-client-id",
+      "scope": "captain",
+      "reviewQueueUrl": "https://coolhandlabs.com/captain/review-queue",
+      "feedbackUrl": "https://coolhandlabs.com/api/v2/llm_request_log_feedbacks"
+    },
+    {
+      "type": "oauth",
+      "id": "acme-fleet",
+      "label": "Sign in with Acme Fleet Ops",
+      "authorizeUrl": "https://acme.example.com/oauth/authorize",
+      "tokenUrl": "https://acme.example.com/oauth/token",
+      "clientId": "your-registered-acme-client-id",
+      "scope": "captain",
+      "reviewQueueUrl": "https://acme.example.com/captain/review-queue",
+      "feedbackUrl": "https://acme.example.com/api/v2/llm_request_log_feedbacks"
+    }
+  ]
+}

@@ -145,13 +145,18 @@ export async function encodeAndSubmit(
   }
 
   if (cfg.mode === 'coolhand' || cfg.mode === 'both') {
+    // 'both' mode's Coolhand write is an unconditional dual-write to Coolhand
+    // specifically, always at its real endpoint. Plain 'coolhand' mode targets
+    // whichever entry point's session is active (config/entry-points.ts),
+    // falling back to Coolhand's endpoint when unconfigured.
+    const url = cfg.mode === 'both' ? COOLHAND_FEEDBACK_URL : (cfg.coolhandFeedbackUrl ?? COOLHAND_FEEDBACK_URL);
     const records = encodeCoolhandRecords(item, draft, creatorId);
     // Sequential fail-fast: on error, records already sent stay marked and the
     // retry picks up from the first unsent one.
     for (let i = 0; i < records.length; i++) {
       const key = `coolhand:${i}`;
       if (alreadyDone(item.id, key)) continue;
-      await postJson(COOLHAND_FEEDBACK_URL, records[i], getAuthHeaders('coolhand'));
+      await postJson(url, records[i], getAuthHeaders('coolhand'));
       markDone(item.id, key);
     }
   }

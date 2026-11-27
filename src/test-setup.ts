@@ -4,7 +4,7 @@ import * as axeMatchers from 'vitest-axe/matchers';
 
 expect.extend(axeMatchers);
 
-// jsdom does not implement modal dialogs; the AuthModal uses the native
+// jsdom does not implement modal dialogs; CustomBackendModal uses the native
 // <dialog> element (Basecoat pattern). Minimal shim for tests.
 HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
   this.setAttribute('open', '');

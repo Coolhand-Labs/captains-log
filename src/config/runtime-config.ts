@@ -1,5 +1,5 @@
 import { signal } from '@preact/signals';
-import { COOLHAND_REVIEW_QUEUE_URL } from './constants';
+import { COOLHAND_FEEDBACK_URL, COOLHAND_REVIEW_QUEUE_URL } from './constants';
 
 /**
  * Backend/data mode (PRD §6.2):
@@ -16,7 +16,12 @@ export interface RuntimeConfig {
   reviewQueueUrl: string;
   /** Self-hosted feedback endpoint base (POST {feedbackUrl}/{id}/feedback). */
   feedbackUrl?: string;
-  coolhandOauthClientId?: string;
+  /**
+   * Coolhand-shaped feedback endpoint for 'coolhand' mode. Defaults to Coolhand's own
+   * endpoint; overwritten to the signed-in entry point's `feedbackUrl` on OAuth login
+   * (see services/auth/oauth.ts) so non-Coolhand entries write to their own backend.
+   */
+  coolhandFeedbackUrl?: string;
   coolhandApiKey?: string;
   /** Optional hardcoded creator_unique_id (PRD §6.1 Path B). */
   creatorId?: string;
@@ -27,6 +32,7 @@ export interface RuntimeConfig {
 const DEFAULTS: RuntimeConfig = {
   mode: 'demo',
   reviewQueueUrl: COOLHAND_REVIEW_QUEUE_URL,
+  coolhandFeedbackUrl: COOLHAND_FEEDBACK_URL,
   demo: true,
 };
 
@@ -38,7 +44,7 @@ function fromEnv(): Partial<RuntimeConfig> {
   if (env.VITE_MODE) out.mode = env.VITE_MODE as Mode;
   if (env.VITE_REVIEW_QUEUE_URL) out.reviewQueueUrl = env.VITE_REVIEW_QUEUE_URL;
   if (env.VITE_FEEDBACK_URL) out.feedbackUrl = env.VITE_FEEDBACK_URL;
-  if (env.VITE_COOLHAND_OAUTH_CLIENT_ID) out.coolhandOauthClientId = env.VITE_COOLHAND_OAUTH_CLIENT_ID;
+  if (env.VITE_COOLHAND_FEEDBACK_URL) out.coolhandFeedbackUrl = env.VITE_COOLHAND_FEEDBACK_URL;
   if (env.VITE_COOLHAND_API_KEY) out.coolhandApiKey = env.VITE_COOLHAND_API_KEY;
   if (env.VITE_CREATOR_ID) out.creatorId = env.VITE_CREATOR_ID;
   if (env.VITE_DEMO !== undefined) out.demo = env.VITE_DEMO === 'true';
